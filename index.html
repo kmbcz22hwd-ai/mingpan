@@ -268,7 +268,6 @@ header p { color:rgba(255,255,255,.4); font-size:.72rem; letter-spacing:.08em; m
 .sec-body { font-size:.88rem; line-height:1.9; color:#2a200e; }
 .sec-body p { margin-bottom:8px; }
 
-/* 數字網格（簡化版） */
 .palace-grid {
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -327,18 +326,6 @@ header p { color:rgba(255,255,255,.4); font-size:.72rem; letter-spacing:.08em; m
 .lnum.j .val { color:var(--jade); }
 .lnum.r .val { color:var(--rust); }
 
-.warn-box {
-  background:#fff8e6;
-  border:1px solid #e8c86a;
-  border-radius:4px;
-  padding:12px 16px;
-  font-size:.82rem;
-  color:#6b4a10;
-  line-height:1.7;
-  margin-bottom:12px;
-}
-
-/* 流年流月月份詳解 */
 .month-detail {
   background:#f9f5f0;
   border-left:4px solid var(--jade);
@@ -443,7 +430,7 @@ header p { color:rgba(255,255,255,.4); font-size:.72rem; letter-spacing:.08em; m
         <label>✦ 出生時辰（紫微鬥數用）</label>
         <select id="f-hour">
           <option value="">-- 選擇時辰 --</option>
-          <option value="">不確定時辰</option>
+          <option value="uncertain">不確定時辰</option>
           <option value="0">子時 23:00-00:59</option>
           <option value="1">丑時 01:00-02:59</option>
           <option value="2">寅時 03:00-04:59</option>
@@ -582,6 +569,7 @@ function initDateSelects() {
   const yearSel = document.getElementById('f-year');
   const daySel = document.getElementById('f-day');
   
+  // 修復：年份範圍到2025年
   for (let y = 1960; y <= 2025; y++) {
     const opt = document.createElement('option');
     opt.value = y;
@@ -634,9 +622,8 @@ function getMissing(counts) {
   return Object.keys(counts).filter(k => counts[k] === 0).map(Number);
 }
 
-// 根據時辰計算宮位
 function getPalaceByHour(hour) {
-  if (!hour) return '中宮';
+  if (!hour || hour === 'uncertain') return '中宮';
   const hourToPalace = [4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3];
   return hourToPalace[parseInt(hour) % 12];
 }
@@ -651,7 +638,7 @@ const R = {
     5: { label: '自由‧變化‧平衡', e: '熱愛自由與探索，適應力強，人生充滿變化。' },
     6: { label: '愛‧家庭‧照顧', e: '責任感強烈，重視家庭與愛，天生的照顧者。' },
     7: { label: '思考‧研究‧內省', e: '深度思考者，偏好探索真理，靈性敏感度高。' },
-    8: { label: '成就‧財富‧管理', e: '目標明確，具備管理天賦與商業頭��。' },
+    8: { label: '成就‧財富‧管理', e: '��標明確，具備管理天賦與商業頭腦。' },
     9: { label: '智慧‧奉獻‧慈悲', e: '理想主義者，大格局視野，天生的奉獻者與導師。' },
     11: { label: '靈性大師數', e: '直覺強、感受深，對靈性與使命敏感。' },
     22: { label: '建構大師數', e: '格局大、能力強，具備將夢想落實為現實的才能。' }
@@ -721,7 +708,7 @@ function renderCoreNums(lp, analYear, hour) {
   const el = document.getElementById('r-core');
   const yf = reduceNumber(lp + reduceNumber(analYear % 100));
   const numData = R.nums[lp];
-  const hourText = hour ? ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'][parseInt(hour)] : '不確定';
+  const hourText = hour && hour !== 'uncertain' ? ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'][parseInt(hour)] : '不確定';
 
   el.innerHTML = `
     <div class="lnum-row">
@@ -734,7 +721,7 @@ function renderCoreNums(lp, analYear, hour) {
   `;
 }
 
-// 渲染九宮格（簡化版 - 直接顯示數字）
+// 渲染九宮格
 function renderPalace(counts, miss, conns) {
   const PALACE_POS = [7, 8, 9, 4, 5, 6, 1, 2, 3];
   let grid = '<div class="palace-grid">';
@@ -779,17 +766,14 @@ function renderPalace(counts, miss, conns) {
   document.getElementById('r-conn').innerHTML = connHtml;
 }
 
-// 計算月份靈數
 function getMonthLifeNum(lifePath, month) {
   return reduceNumber(lifePath + month);
 }
 
-// 生成流年流月詳解
 function generateYearlyMonthDetails(lp, analYear, status, conns) {
   const yf = reduceNumber(lp + reduceNumber(analYear % 100));
   let html = '';
   
-  // 按月份詳解
   for (let m = 1; m <= 12; m++) {
     const mf = getMonthLifeNum(yf, m);
     const monthName = m + '月';
@@ -799,7 +783,6 @@ function generateYearlyMonthDetails(lp, analYear, status, conns) {
       <strong>${monthName} - 靈數${mf}（${R.yearEnergy[mf].t}）</strong>
       <p>${monthEnergy}</p>`;
     
-    // 根據生命靈數和狀態添加詳細運勢
     if (status === '單身' && [1,2,3].includes(m)) {
       html += `<p style="color:var(--rust);margin-top:4px">💕 <strong>單身提醒：</strong>上半年桃花運較佳，特別是3月容易有新的人際接觸。建議多參加社交活動。</p>`;
     }
@@ -819,7 +802,6 @@ function generateYearlyMonthDetails(lp, analYear, status, conns) {
   return html;
 }
 
-// 設定段落內容
 function setSecBody(id, text) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -830,7 +812,6 @@ function setSecBody(id, text) {
   }
 }
 
-// 本地分析
 function localAnalysis(meta) {
   const { name, lp, analYear, status, focuses, miss, conns, hour } = meta;
   const numData = R.nums[lp];
@@ -851,7 +832,7 @@ function localAnalysis(meta) {
       5: '喜愛自由，易感受新鮮感但也易移情別戀。',
       6: '重視家庭與承諾，是很好的伴侶。',
       7: '理性內斂，感情來得慢但深度強。',
-      8: '目標導向，會尋找匹配的伴侶來互相支持。',
+      8: '目標導向，會尋���匹配的伴侶來互相支持。',
       9: '理想主義，希望找到靈魂伴侶。'
     };
     
@@ -870,7 +851,7 @@ function localAnalysis(meta) {
         9: '3、6、9數人理解你的理想主義。'
       };
       const peachBlossom = [1, 3, 5, 8, 9].includes(yf) ? '較為活躍' : '需要主動把握';
-      text += `\n\n【${analYear}年桃花運勢】\n${analYear}年${yearData.t}的能量中，你的桃花運${peachBlossom}。${correctMatch[lp]}建議你積極參與社交，特別在3月、6月、9月有較��的人際互動機會。但也要留意可能出現的爛桃花，保持清醒判斷。`;
+      text += `\n\n【${analYear}年桃花運勢】\n${analYear}年${yearData.t}的能量中，你的桃花運${peachBlossom}。${correctMatch[lp]}建議你積極參與社交，特別在3月、6月、9月有較佳的人際互動機會。但也要留意可能出現的爛桃花，保持清醒判斷。`;
     }
     
     text += `\n\n${analYear}年${yearData.t}，建議你${yearData.d}`;
@@ -898,7 +879,7 @@ function localAnalysis(meta) {
       1: '領導、創業、銷售、管理工作最適合。',
       2: '人資、諮詢、客服、教育工作。',
       3: '傳媒、教育、市場、表演、創意工作。',
-      4: '管��、工程、會計、建築、技術工作。',
+      4: '管理、工程、會計、建築、技術工作。',
       5: '業務、旅遊、媒體、自由職業。',
       6: '醫療、社工、人力、護理、輔導工作。',
       7: '研究、心理、宗教、分析、學術工作。',
@@ -929,7 +910,7 @@ function localAnalysis(meta) {
       ? '你命盤中有「情感線」，情感與溝通是你的貴人磁石。'
       : '建議多主動出擊，發展你的社交網絡。';
     
-    const text = `${noblesMap[lp]}\n\n${connHint}\n\n${analYear}年${yearData.t}，建議你${yearData.d}此時積極拓展人脈的最好時機。特別注意2月、3月、6月人際互動較頻繁，9月新貴人出現的機率最高。';
+    const text = `${noblesMap[lp]}\n\n${connHint}\n\n${analYear}年${yearData.t}，建議你${yearData.d}此時積極拓展人脈的最好時機。特別注意2月、3月、6月人際互動較頻繁，9月新貴人出現的機率最高。`;
     setSecBody('r-nobles', text);
   }
 
@@ -949,11 +930,9 @@ function localAnalysis(meta) {
     setSecBody('r-health', text);
   }
 
-  // 流年流月詳解
   const yearlyHtml = generateYearlyMonthDetails(lp, analYear, status, conns);
   document.getElementById('r-yearly').innerHTML = yearlyHtml;
 
-  // 綜合建議
   let adviceText = `親愛的${name}，\n\n你的生命靈數${lp}（${numData.label}）帶著${analYear}年${yearData.t}的能量。`;
   if (miss.length > 0) {
     adviceText += `\n\n這一年特別重要的功課是：${miss.map(n => R.missing[n].split('：')[0]).join('、')}。`;
@@ -961,7 +940,7 @@ function localAnalysis(meta) {
   if (conns.length > 0) {
     adviceText += `\n\n你命盤中的${conns.map(l => R.conns[l]?.name).join('、')}能量完整，充分發揮這些優勢將帶來突破。`;
   }
-  adviceText += `\n\n${yearData.d}\n\n${hour ? '出生時辰' + ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'][parseInt(hour)] + '時' : '未確定時辰'}的你，帶著獨特的生命使命。用心感受流年的節奏，在對應的月份把握機遇，相信${analYear}年將帶給你豐碩的收穫。`;
+  adviceText += `\n\n${yearData.d}\n\n${hour && hour !== 'uncertain' ? '出生時辰' + ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'][parseInt(hour)] + '時' : '未確定時辰'}的你，帶著獨特的生命使命。用心感受流年的節奏，在對應的月份把握機遇，相信${analYear}年將帶給你豐碩的收穫。`;
   setSecBody('r-advice', adviceText);
 }
 
@@ -996,7 +975,7 @@ async function startAnalysis() {
     const miss = getMissing(counts);
 
     const statusMap = { single: '單身', dating: '交往中', married: '已婚', divorced: '離婚／分手後' };
-    const hourText = hour ? ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'][parseInt(hour)] : '不確定';
+    const hourText = hour && hour !== 'uncertain' ? ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'][parseInt(hour)] : '不確定';
     
     document.getElementById('r-name').textContent = `${name} ｜ 靈數命盤`;
     document.getElementById('r-meta').textContent = `${birth}（${hourText}時） ✦ ${statusMap[status]} ✦ ${analYear}年解析`;
@@ -1041,23 +1020,29 @@ async function startAnalysis() {
 
 // 事件綁定
 document.addEventListener('DOMContentLoaded', function () {
+  console.log('✓ 頁面已加載');
   initDateSelects();
   
+  // Tab 按鈕
   document.getElementById('tab-input').addEventListener('click', () => showTab('input'));
   document.getElementById('tab-result').addEventListener('click', () => showTab('result'));
 
+  // 面向選擇
   document.querySelectorAll('#focus-pills .pill').forEach(pill => {
     pill.addEventListener('click', function () {
       this.classList.toggle('active');
     });
   });
 
+  // 開始按鈕
   document.getElementById('btn-start').addEventListener('click', startAnalysis);
 
+  // 返回按鈕
   document.getElementById('btn-back').addEventListener('click', () => {
     showTab('input');
   });
 
+  // 複製按鈕
   document.getElementById('btn-copy').addEventListener('click', function () {
     const sections = ['r-name', 'r-meta', 'r-core', 'r-palace', 'r-conn', 'r-personality', 'r-love', 'r-wealth', 'r-career', 'r-nobles', 'r-health', 'r-yearly', 'r-advice'];
     let text = '';
@@ -1073,6 +1058,7 @@ document.addEventListener('DOMContentLoaded', function () {
       .catch(() => alert('複製失敗，請手動選取'));
   });
 
+  // 列印按鈕
   document.getElementById('btn-print').addEventListener('click', () => {
     window.print();
   });
