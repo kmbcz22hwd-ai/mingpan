@@ -121,6 +121,7 @@ header p { color:rgba(255,255,255,.4); font-size:.72rem; letter-spacing:.08em; m
   margin-bottom:12px;
 }
 .form-row.full { grid-template-columns:1fr; }
+.form-row.triple { grid-template-columns:1fr 1fr 1fr; }
 
 .field { display:flex; flex-direction:column; gap:5px; }
 .field label {
@@ -331,6 +332,7 @@ header p { color:rgba(255,255,255,.4); font-size:.72rem; letter-spacing:.08em; m
 
 @media (max-width:480px) {
   .form-row { grid-template-columns:1fr; }
+  .form-row.triple { grid-template-columns:1fr; }
   .palace { grid-template-columns:repeat(3,72px); grid-template-rows:repeat(3,72px); }
 }
 @media print {
@@ -381,8 +383,51 @@ header p { color:rgba(255,255,255,.4); font-size:.72rem; letter-spacing:.08em; m
 
     <div class="form-row full">
       <div class="field">
-        <label>出生日期（年-月-日）</label>
-        <input type="date" id="f-birth" placeholder="YYYY-MM-DD">
+        <label>✦ 出生年月日（分開選擇）</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <select id="f-year">
+            <option value="">-- 年份 --</option>
+          </select>
+          <select id="f-month">
+            <option value="">-- 月份 --</option>
+            <option value="01">1月</option>
+            <option value="02">2月</option>
+            <option value="03">3月</option>
+            <option value="04">4月</option>
+            <option value="05">5月</option>
+            <option value="06">6月</option>
+            <option value="07">7月</option>
+            <option value="08">8月</option>
+            <option value="09">9月</option>
+            <option value="10">10月</option>
+            <option value="11">11月</option>
+            <option value="12">12月</option>
+          </select>
+          <select id="f-day">
+            <option value="">-- 日期 --</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row full">
+      <div class="field">
+        <label>✦ 出生時辰（紫微鬥數用）</label>
+        <select id="f-hour">
+          <option value="">-- 選擇時辰 --</option>
+          <option value="0">子時 23:00-00:59</option>
+          <option value="1">丑時 01:00-02:59</option>
+          <option value="2">寅時 03:00-04:59</option>
+          <option value="3">卯時 05:00-06:59</option>
+          <option value="4">辰時 07:00-08:59</option>
+          <option value="5">巳時 09:00-10:59</option>
+          <option value="6">午時 11:00-12:59</option>
+          <option value="7">未時 13:00-14:59</option>
+          <option value="8">申時 15:00-16:59</option>
+          <option value="9">酉時 17:00-18:59</option>
+          <option value="10">戌時 19:00-20:59</option>
+          <option value="11">亥時 21:00-22:59</option>
+        </select>
       </div>
     </div>
 
@@ -415,6 +460,7 @@ header p { color:rgba(255,255,255,.4); font-size:.72rem; letter-spacing:.08em; m
       <div class="pill active" data-focus="love">感情愛情</div>
       <div class="pill active" data-focus="wealth">財運財富</div>
       <div class="pill active" data-focus="career">事業天賦</div>
+      <div class="pill active" data-focus="nobles">貴人運</div>
       <div class="pill" data-focus="health">健康養生</div>
     </div>
   </div>
@@ -477,6 +523,11 @@ header p { color:rgba(255,255,255,.4); font-size:.72rem; letter-spacing:.08em; m
     <div class="sec-body" id="r-career"></div>
   </div>
 
+  <div class="sec" id="sec-nobles" style="display:none">
+    <div class="sec-head"><div class="sec-num">◆</div>貴人運與人脈</div>
+    <div class="sec-body" id="r-nobles"></div>
+  </div>
+
   <div class="sec" id="sec-health" style="display:none">
     <div class="sec-head"><div class="sec-num">◆</div>健康提醒</div>
     <div class="sec-body" id="r-health"></div>
@@ -491,6 +542,26 @@ header p { color:rgba(255,255,255,.4); font-size:.72rem; letter-spacing:.08em; m
 </div><!-- /wrap -->
 
 <script>
+// 初始化年份與日期
+function initDateSelects() {
+  const yearSel = document.getElementById('f-year');
+  const daySel = document.getElementById('f-day');
+  
+  for (let y = 1960; y <= 2025; y++) {
+    const opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y + '年';
+    yearSel.appendChild(opt);
+  }
+  
+  for (let d = 1; d <= 31; d++) {
+    const opt = document.createElement('option');
+    opt.value = String(d).padStart(2, '0');
+    opt.textContent = d + '日';
+    daySel.appendChild(opt);
+  }
+}
+
 // ✔ 正確的數字簡化算法（保留11、22靈數）
 function reduceNumber(num) {
   while (num > 9 && num !== 11 && num !== 22) {
@@ -526,6 +597,12 @@ function getConnections(counts) {
 
 function getMissing(counts) {
   return Object.keys(counts).filter(k => counts[k] === 0).map(Number);
+}
+
+// 根據時辰計算宮位
+function getPalaceByHour(hour) {
+  const hourToPalace = [4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3];
+  return hourToPalace[parseInt(hour) % 12];
 }
 
 // 規則庫
@@ -593,22 +670,24 @@ function showTab(tab) {
 }
 
 // 渲染核心靈數
-function renderCoreNums(lp, analYear) {
+function renderCoreNums(lp, analYear, hour) {
   const el = document.getElementById('r-core');
   const yf = reduceNumber(lp + reduceNumber(analYear % 100));
   const numData = R.nums[lp];
+  const hourText = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'][parseInt(hour)];
 
   el.innerHTML = `
     <div class="lnum-row">
       <div class="lnum"><div class="lab">生命靈數</div><div class="val">${lp}</div></div>
       <div class="lnum r"><div class="lab">${analYear}流年數</div><div class="val">${yf}</div></div>
+      <div class="lnum j"><div class="lab">出生時辰</div><div class="val">${hourText}</div></div>
     </div>
     <p><strong>【${numData.label}】</strong><br>${numData.e}</p>
     <p style="margin-top:12px"><strong>✦ ${analYear}年運勢（${R.yearEnergy[yf].t}）</strong><br>${R.yearEnergy[yf].d}</p>
   `;
 }
 
-// 渲染九宮格
+// 渲染九宮格（正確排列）
 function renderPalace(counts, miss, conns) {
   const PALACE_POS = [7, 8, 9, 4, 5, 6, 1, 2, 3];
   let grid = '<div class="palace">';
@@ -666,7 +745,7 @@ function setSecBody(id, text) {
 
 // 本地分析
 function localAnalysis(meta) {
-  const { name, lp, analYear, status, focuses, miss, conns } = meta;
+  const { name, lp, analYear, status, focuses, miss, conns, hour } = meta;
   const numData = R.nums[lp];
   const yf = reduceNumber(lp + reduceNumber(analYear % 100));
   const yearData = R.yearEnergy[yf];
@@ -677,8 +756,36 @@ function localAnalysis(meta) {
   }
 
   if (focuses.includes('love')) {
-    let text = `感情上，${numData.label}的你傾向於${['主動追求', '細心體貼', '樂觀開朗', '穩定可靠', '自由靈活', '溫暖照顧', '理性內斂', '目標導向', '包容大度'][lp - 1] || '真誠以待'}。\n\n`;
-    text += `${analYear}年${yearData.t}，建議你${yearData.d}`;
+    const loveMap = {
+      1: '主動追求感情，有機會卻容易猶豫。',
+      2: '溫柔被動，需要對方主動示好，親密度深。',
+      3: '熱情開朗，易吸引他人，感情進展快。',
+      4: '慎重保守，選擇少但一旦確定就會長久。',
+      5: '喜愛自由，易感受新鮮感但也易移情別戀。',
+      6: '重視家庭與承諾，是很好的伴侶。',
+      7: '理性內斂，感情來得慢但深度強。',
+      8: '目標導向，會尋找匹配的伴侶來互相支持。',
+      9: '理想主義，希望找到靈魂伴侶。'
+    };
+    
+    let text = `感情上，${numData.label}的你傾向於${loveMap[lp]}`;
+    
+    if (status === '單身') {
+      const correctMatch = {
+        1: '2、3、5數人最容易與你產生吸引力。',
+        2: '1、4、8數人較能給你安全感。',
+        3: '1、5、9數人能與你共鳴。',
+        4: '2、6、8數人較能理解你。',
+        5: '1、3、7數人能平衡你的冒險心。',
+        6: '2、4、9數人能與你共建溫暖家庭。',
+        7: '5、7、8數人有共同的深度。',
+        8: '1、4、6、8數人有事業與生活的共鳴。',
+        9: '3、6、9數人理解你的理想主義。'
+      };
+      text += `\n\n【正緣何時來】${analYear}年${yearData.t}的能量中，${yearData.d}${correctMatch[lp]}建議你在${analYear}年積極參與社交活動，特別是${[7,8,9].includes(yf) ? '下半年' : '上半年'}會有機遇。`;
+    }
+    
+    text += `\n\n${analYear}年${yearData.t}，建議你${yearData.d}`;
     setSecBody('r-love', text);
   }
 
@@ -694,24 +801,48 @@ function localAnalysis(meta) {
       8: '財運旺盛，主動出擊能收穫豐碩。',
       9: '大格局投資或慈善最有成效。'
     };
-    const text = `${wealthMap[lp]}\n\n${analYear}年${yearData.t}，${wealthMap[lp].slice(0, 4)}同時${yearData.d}`;
+    const text = `${wealthMap[lp]}\n\n${analYear}年${yearData.t}，你的財運傾向於${wealthMap[lp].slice(0, 4)}，同時${yearData.d}建議你在此年重點關注理財規劃與資產配置。`;
     setSecBody('r-wealth', text);
   }
 
   if (focuses.includes('career')) {
     const careerMap = {
-      1: '領導、創業類工作最適合。',
-      2: '人資、諮詢、客服工作。',
-      3: '傳媒、教育、市場工作。',
-      4: '管理、工程、會計工作。',
-      5: '業務、旅遊、媒體工作。',
-      6: '醫療、社工、人力工作。',
-      7: '研究、心理、宗教工作。',
-      8: '管理、金融、企業工作。',
-      9: '教育、公益、諮詢工作。'
+      1: '領導、創業、銷售、管理工作最適合。',
+      2: '人資、諮詢、客服、教育工作。',
+      3: '傳媒、教育、市場、表演、創意工作。',
+      4: '管理、工程、會計、建築、技術工作。',
+      5: '業務、旅遊、媒體、自由職業。',
+      6: '醫療、社工、人力、護理、輔導工作。',
+      7: '研究、心理、宗教、分析、學術工作。',
+      8: '管理、金融、企業、投資、營銷工作。',
+      9: '教育、公益、諮詢、策劃、文化工作。'
     };
-    const text = `${careerMap[lp]}\n\n${analYear}年的${yearData.t}能量，建議${yearData.d}`;
+    const noblesFromConns = conns.includes('789') ? '特別強' : conns.includes('258') ? '較強' : '一般';
+    const text = `${careerMap[lp]}\n\n${analYear}年的${yearData.t}能量特別適合${yearData.d}你的貴人運勢${noblesFromConns}，建議多參與行業交流與人脈活動。`;
     setSecBody('r-career', text);
+  }
+
+  if (focuses.includes('nobles')) {
+    const noblesMap = {
+      1: '獨立但缺乏主動求助，需要意識到團隊合作的力量。',
+      2: '天生吸引貴人，溝通能力強，易建立深厚人脈。',
+      3: '社交活躍，容易被人喜愛，貴人多。',
+      4: '踏實可靠，貴人願意長期支持你。',
+      5: '適應力強，到處都有朋友，但深度有限。',
+      6: '親和力強，貴人多為長輩或家庭關係。',
+      7: '內斂但有深度，吸引志同道合的貴人。',
+      8: '商業頭腦強，易吸引事業型貴人。',
+      9: '理想主義吸引善良的人，貴人多為志願者型。'
+    };
+    
+    const connHint = conns.includes('789') 
+      ? '你命盤中有「貴人線」，此為大吉象徵，人際緣分極佳！'
+      : conns.includes('258')
+      ? '你命盤中有「情感線」，情感與溝通是你的貴人磁石。'
+      : '建議多主動出擊，發展你的社交網絡。';
+    
+    const text = `${noblesMap[lp]}\n\n${connHint}\n\n${analYear}年${yearData.t}，建議你${yearData.d}此時積極拓展人脈的最好時機，貴人將在你的主動出擊中顯現。`;
+    setSecBody('r-nobles', text);
   }
 
   if (focuses.includes('health')) {
@@ -726,7 +857,7 @@ function localAnalysis(meta) {
       8: '肝臟與血液系統，定期檢查。',
       9: '淋巴與免疫，多給予自己休息。'
     };
-    const text = `${healthMap[lp]}\n\n建議每月安排一次放鬆活動，讓身心同步調整。`;
+    const text = `${healthMap[lp]}\n\n建議每月安排一次放鬆活動，讓身心同步調整。${analYear}年尤其要關注${yearData.t}帶來的能量變化，適度調理身體。`;
     setSecBody('r-health', text);
   }
 
@@ -738,20 +869,23 @@ function localAnalysis(meta) {
   if (conns.length > 0) {
     adviceText += `\n\n你命盤中的${conns.map(l => R.conns[l]?.name).join('、')}能量完整，充分發揮這些優勢將帶來突破。`;
   }
-  adviceText += `\n\n${yearData.d}\n\n祝你${analYear}年命途光燦，步步精進。✦`;
+  adviceText += `\n\n${yearData.d}\n\n出生時辰${['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'][parseInt(hour)]}時的你，帶著特殊的生命使命與天賦。相信你的直覺，珍惜每一段機緣，${analYear}年將是你展現潛能的一年。✦`;
   setSecBody('r-advice', adviceText);
 }
 
 // 主分析
 async function startAnalysis() {
   const name = document.getElementById('f-name').value.trim() || '（未填姓名）';
-  const birth = document.getElementById('f-birth').value;
+  const year = document.getElementById('f-year').value;
+  const month = document.getElementById('f-month').value;
+  const day = document.getElementById('f-day').value;
+  const hour = document.getElementById('f-hour').value;
   const status = document.getElementById('f-status').value;
   const analYear = +document.getElementById('f-anal-year').value;
   const focuses = [...document.querySelectorAll('#focus-pills .pill.active')].map(p => p.dataset.focus);
 
-  if (!birth) {
-    alert('請選擇出生日期');
+  if (!year || !month || !day || hour === '') {
+    alert('請填寫完整的出生年月日與時辰');
     return;
   }
   if (focuses.length === 0) {
@@ -763,16 +897,19 @@ async function startAnalysis() {
   document.getElementById('loading').classList.add('show');
 
   try {
+    const birth = `${year}-${month}-${day}`;
     const lp = getLifePath(birth);
     const counts = getPalaceCounts(birth);
     const conns = getConnections(counts);
     const miss = getMissing(counts);
 
     const statusMap = { single: '單身', dating: '交往中', married: '已婚', divorced: '離婚／分手後' };
+    const hourText = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'][parseInt(hour)];
+    
     document.getElementById('r-name').textContent = `${name} ｜ 靈數命盤`;
-    document.getElementById('r-meta').textContent = `${birth} ✦ ${statusMap[status]} ✦ ${analYear}年解析`;
+    document.getElementById('r-meta').textContent = `${birth}（${hourText}時） ✦ ${statusMap[status]} ✦ ${analYear}年解析`;
 
-    renderCoreNums(lp, analYear);
+    renderCoreNums(lp, analYear, hour);
     renderPalace(counts, miss, conns);
 
     const secMap = {
@@ -780,6 +917,7 @@ async function startAnalysis() {
       love: 'sec-love',
       wealth: 'sec-wealth',
       career: 'sec-career',
+      nobles: 'sec-nobles',
       health: 'sec-health'
     };
     Object.entries(secMap).forEach(([k, id]) => {
@@ -794,7 +932,8 @@ async function startAnalysis() {
       status: statusMap[status],
       focuses,
       miss,
-      conns
+      conns,
+      hour
     });
 
     document.getElementById('loading').classList.remove('show');
@@ -810,6 +949,8 @@ async function startAnalysis() {
 
 // 事件綁定
 document.addEventListener('DOMContentLoaded', function () {
+  initDateSelects();
+  
   document.getElementById('tab-input').addEventListener('click', () => showTab('input'));
   document.getElementById('tab-result').addEventListener('click', () => showTab('result'));
 
@@ -826,7 +967,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   document.getElementById('btn-copy').addEventListener('click', function () {
-    const sections = ['r-name', 'r-meta', 'r-core', 'r-palace', 'r-conn', 'r-personality', 'r-love', 'r-wealth', 'r-career', 'r-health', 'r-advice'];
+    const sections = ['r-name', 'r-meta', 'r-core', 'r-palace', 'r-conn', 'r-personality', 'r-love', 'r-wealth', 'r-career', 'r-nobles', 'r-health', 'r-advice'];
     let text = '';
     sections.forEach(id => {
       const el = document.getElementById(id);
