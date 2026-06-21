@@ -3,176 +3,985 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>命盤解析系統 AI版</title>
-
+<title>靈數命盤｜完整解析系統</title>
 <style>
-body{
-  margin:0;
-  font-family:"Noto Serif TC", serif;
-  background:#0f0f1a;
-  color:#fff;
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+:root{
+  --ink:#12100a;--bg:#f5f0e6;--gold:#b8923a;--gold-lt:#e8d5a0;--gold-pale:#faf6eb;
+  --jade:#2a5e50;--jade-lt:#e4f0ec;--rust:#7d3520;--mist:#6b7280;--border:#d6c99a;--card:#fffdf6;
 }
-
-.nav{
-  display:flex;
-  flex-wrap:wrap;
-  background:#1c1c2e;
-  padding:10px;
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
+/* HEADER */
+.header{background:var(--ink);padding:18px 20px;display:flex;align-items:center;gap:12px;}
+.logo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;width:36px;height:36px;padding:4px;border:1.5px solid var(--gold);}
+.logo-grid span{background:var(--gold);opacity:.5;}
+.logo-grid span:nth-child(5){opacity:1;}
+.header h1{font-family:'Noto Serif TC',serif;color:var(--gold);font-size:1.1rem;letter-spacing:.1em;}
+.header p{color:rgba(255,255,255,.4);font-size:.7rem;margin-top:2px;letter-spacing:.06em;}
+/* NAV */
+.nav{background:var(--ink);display:flex;border-top:1px solid rgba(255,255,255,.08);overflow-x:auto;}
+.nav a{color:rgba(255,255,255,.45);padding:10px 14px;font-size:.78rem;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;text-decoration:none;transition:all .2s;}
+.nav a.on{color:var(--gold);border-bottom-color:var(--gold);}
+/* VIEWS */
+.view{display:none;}.view.on{display:block;}
+.wrap{max-width:680px;margin:0 auto;padding:24px 16px 80px;}
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:22px 20px;margin-bottom:14px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--jade));}
+.card-title{font-family:'Noto Serif TC',serif;font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:16px;letter-spacing:.06em;}
+/* FORM */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+.row1{margin-bottom:10px;}
+.field label{display:block;font-size:.72rem;color:var(--mist);letter-spacing:.06em;margin-bottom:4px;}
+.field select,.field input{width:100%;border:1px solid var(--border);background:var(--bg);padding:9px 10px;font-family:'Noto Sans TC',sans-serif;font-size:.88rem;color:var(--ink);border-radius:4px;outline:none;}
+.field select:focus,.field input:focus{border-color:var(--gold);}
+.btn{display:block;width:100%;padding:13px;background:var(--ink);color:var(--gold);border:none;border-radius:4px;font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;letter-spacing:.1em;cursor:pointer;margin-top:8px;}
+.btn:hover{background:#2d2010;}
+/* PAGES */
+.pages{display:none;}.pages.on{display:block;}
+.page-nav{display:flex;overflow-x:auto;gap:0;margin-bottom:16px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px;}
+.pnav-btn{flex-shrink:0;padding:7px 12px;border:none;background:transparent;border-radius:4px;font-size:.75rem;cursor:pointer;color:var(--mist);font-family:'Noto Sans TC',sans-serif;white-space:nowrap;}
+.pnav-btn.on{background:var(--ink);color:var(--gold);font-weight:700;}
+.page{display:none;}.page.on{display:block;}
+/* SECTION */
+.sec{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px;margin-bottom:12px;}
+.sec-head{font-family:'Noto Serif TC',serif;font-size:.9rem;font-weight:700;color:var(--jade);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.sec-icon{width:22px;height:22px;background:var(--jade);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;flex-shrink:0;}
+.sec-body{font-size:.86rem;line-height:1.95;color:#2a200e;}
+.sec-body p{margin-bottom:8px;}
+/* PALACE */
+.palace{display:grid;grid-template-columns:repeat(3,80px);grid-template-rows:repeat(3,80px);gap:2px;background:var(--border);border:2px solid var(--border);border-radius:4px;overflow:hidden;}
+.pc{background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;}
+.pc .pnum{position:absolute;top:4px;left:6px;font-size:.55rem;color:var(--border);}
+.pc .pval{font-family:'Noto Serif TC',serif;font-size:1.6rem;font-weight:900;color:var(--gold);line-height:1;}
+.pc.empty .pval{color:var(--border);font-weight:300;font-size:1.3rem;}
+.pc.multi .pval{color:var(--jade);}
+.pc.miss{background:#fdf6f4;}
+.pc.miss .pval{color:#e8c4b8;}
+/* CHIPS */
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;}
+.chip{padding:4px 10px;border-radius:3px;font-size:.8rem;font-weight:700;font-family:'Noto Serif TC',serif;border:1px solid;}
+.chip.g{background:var(--gold-pale);color:#8a6820;border-color:var(--gold-lt);}
+.chip.j{background:var(--jade-lt);color:var(--jade);border-color:#a0ccc4;}
+.chip.r{background:#fff0ee;color:var(--rust);border-color:#f0c8c0;}
+/* BIG NUM */
+.bnum{font-family:'Noto Serif TC',serif;font-size:4rem;font-weight:900;color:var(--gold);line-height:1;}
+.bnum-row{display:flex;gap:24px;flex-wrap:wrap;margin:12px 0;}
+.bnum-item .bl{font-size:.7rem;color:var(--mist);letter-spacing:.06em;margin-bottom:4px;}
+.bnum-item .bv{font-family:'Noto Serif TC',serif;font-size:2.2rem;font-weight:900;color:var(--gold);line-height:1;}
+.bnum-item.j .bv{color:var(--jade);}
+.bnum-item.r .bv{color:var(--rust);}
+/* STAR */
+.stars{color:var(--gold);letter-spacing:2px;font-size:1rem;}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:8px;}
+.tbl th{background:var(--ink);color:var(--gold);padding:8px 10px;text-align:left;font-size:.76rem;letter-spacing:.04em;}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.6;}
+.tbl tr:nth-child(even) td{background:var(--gold-pale);}
+.tbl .mn{font-family:'Noto Serif TC',serif;font-weight:700;color:var(--gold);}
+.tbl .mf{font-family:'Noto Serif TC',serif;font-weight:700;color:var(--jade);}
+/* CONN */
+.conn{background:var(--gold-pale);border:1px solid var(--gold-lt);border-radius:4px;padding:14px 16px;margin-bottom:10px;}
+.conn-t{font-family:'Noto Serif TC',serif;font-size:.9rem;font-weight:700;color:var(--gold);margin-bottom:6px;}
+.conn-d{font-size:.83rem;line-height:1.85;color:#3d2d10;}
+/* EXPORT */
+.export-bar{background:var(--ink);border-radius:6px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.export-bar p{color:rgba(255,255,255,.6);font-size:.82rem;}
+.ebtn{background:var(--gold);color:var(--ink);border:none;padding:9px 18px;border-radius:4px;font-size:.82rem;font-weight:700;cursor:pointer;}
+/* CRM */
+.crm-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.crm-header h2{font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;}
+.crm-add{background:var(--jade);color:#fff;border:none;padding:8px 16px;border-radius:4px;font-size:.82rem;cursor:pointer;}
+.client-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;}
+.cc-info h3{font-size:.92rem;font-weight:700;margin-bottom:4px;}
+.cc-info p{font-size:.78rem;color:var(--mist);line-height:1.6;}
+.cc-btns{display:flex;gap:6px;flex-shrink:0;}
+.cc-btn{padding:6px 12px;border:1px solid var(--border);border-radius:3px;font-size:.75rem;cursor:pointer;background:var(--bg);}
+.cc-btn.primary{background:var(--jade);color:#fff;border-color:var(--jade);}
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;}
+.modal-bg.on{display:flex;}
+.modal{background:#fff;border-radius:8px;padding:24px;width:90%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.modal h2{font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;margin-bottom:16px;}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+.modal-btn{padding:9px 20px;border-radius:4px;border:none;cursor:pointer;font-size:.85rem;font-weight:700;}
+.modal-btn.save{background:var(--jade);color:#fff;}
+.modal-btn.cancel{background:var(--bg);border:1px solid var(--border);}
+/* LOADING */
+#loading{display:none;text-align:center;padding:48px 0;}
+#loading.on{display:block;}
+.spin{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+/* PRINT */
+@media print{
+  .header,.nav,.export-bar,.page-nav,#loading{display:none!important;}
+  .pages.on,.page.on{display:block!important;}
+  .page{display:block!important;}
+  body{background:#fff;}
 }
-
-.nav button{
-  margin:4px;
-  padding:8px 12px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  background:#333;
-  color:#fff;
-}
-
-.nav button.on{
-  background:#ffcc00;
-  color:#000;
-}
-
-.page{
-  display:none;
-  padding:20px;
-}
-
-.page.on{
-  display:block;
-}
-
-input, textarea{
-  width:100%;
-  padding:8px;
-  margin:6px 0;
-  border-radius:6px;
-  border:none;
-}
-
-.card{
-  background:#1c1c2e;
-  padding:15px;
-  border-radius:10px;
-  margin-top:10px;
+@media(max-width:480px){
+  .row2,.row3{grid-template-columns:1fr;}
+  .palace{grid-template-columns:repeat(3,72px);grid-template-rows:repeat(3,72px);}
 }
 </style>
 </head>
-
 <body>
 
-<!-- 導覽列 -->
-<div class="nav" id="nav"></div>
+<div class="header">
+  <div class="logo-grid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div><h1>靈數命盤解析</h1><p>完整 17 頁深度解讀系統</p></div>
+</div>
 
-<!-- 17頁內容 -->
-<div id="pages"></div>
+<div class="nav">
+  <a class="on" onclick="goNav('analyze',this)">📋 輸入解析</a>
+  <a onclick="goNav('crm',this)">👤 客戶管理</a>
+</div>
+
+<!-- ══ ANALYZE VIEW ══ -->
+<div id="analyze" class="view on">
+<div class="wrap">
+
+  <div class="card">
+    <div class="card-title">基本資料</div>
+    <div class="row2">
+      <div class="field"><label>姓名</label><input type="text" id="f-name" placeholder="輸入姓名"></div>
+      <div class="field"><label>性別</label>
+        <select id="f-gender"><option value="female">女性</option><option value="male">男性</option></select>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field"><label>出生年</label>
+        <select id="f-year">
+          <option value="">請選擇</option>
+          <option value="2005">2005</option><option value="2004">2004</option><option value="2003">2003</option><option value="2002">2002</option><option value="2001">2001</option>
+          <option value="2000">2000</option><option value="1999">1999</option><option value="1998">1998</option><option value="1997">1997</option><option value="1996">1996</option>
+          <option value="1995">1995</option><option value="1994">1994</option><option value="1993">1993</option><option value="1992">1992</option><option value="1991">1991</option>
+          <option value="1990">1990</option><option value="1989">1989</option><option value="1988">1988</option><option value="1987">1987</option><option value="1986">1986</option>
+          <option value="1985">1985</option><option value="1984">1984</option><option value="1983">1983</option><option value="1982">1982</option><option value="1981">1981</option>
+          <option value="1980">1980</option><option value="1979">1979</option><option value="1978">1978</option><option value="1977">1977</option><option value="1976">1976</option>
+          <option value="1975">1975</option><option value="1974">1974</option><option value="1973">1973</option><option value="1972">1972</option><option value="1971">1971</option>
+          <option value="1970">1970</option><option value="1969">1969</option><option value="1968">1968</option><option value="1967">1967</option><option value="1966">1966</option>
+          <option value="1965">1965</option><option value="1964">1964</option><option value="1963">1963</option><option value="1962">1962</option><option value="1961">1961</option>
+          <option value="1960">1960</option><option value="1959">1959</option><option value="1958">1958</option><option value="1957">1957</option><option value="1956">1956</option>
+          <option value="1955">1955</option><option value="1954">1954</option><option value="1953">1953</option><option value="1952">1952</option><option value="1951">1951</option>
+          <option value="1950">1950</option><option value="1949">1949</option><option value="1948">1948</option><option value="1947">1947</option><option value="1946">1946</option>
+          <option value="1945">1945</option><option value="1944">1944</option><option value="1943">1943</option><option value="1942">1942</option><option value="1941">1941</option>
+          <option value="1940">1940</option>
+        </select>
+      </div>
+      <div class="field"><label>出生月</label>
+        <select id="f-month">
+          <option value="">請選擇</option>
+          <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option>
+          <option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option>
+          <option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+        </select>
+      </div>
+      <div class="field"><label>出生日</label>
+        <select id="f-day">
+          <option value="">請選擇</option>
+          <option value="1">1日</option><option value="2">2日</option><option value="3">3日</option><option value="4">4日</option><option value="5">5日</option>
+          <option value="6">6日</option><option value="7">7日</option><option value="8">8日</option><option value="9">9日</option><option value="10">10日</option>
+          <option value="11">11日</option><option value="12">12日</option><option value="13">13日</option><option value="14">14日</option><option value="15">15日</option>
+          <option value="16">16日</option><option value="17">17日</option><option value="18">18日</option><option value="19">19日</option><option value="20">20日</option>
+          <option value="21">21日</option><option value="22">22日</option><option value="23">23日</option><option value="24">24日</option><option value="25">25日</option>
+          <option value="26">26日</option><option value="27">27日</option><option value="28">28日</option><option value="29">29日</option><option value="30">30日</option>
+          <option value="31">31日</option>
+        </select>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>感情狀態</label>
+        <select id="f-status"><option value="single">單身</option><option value="dating">交往中</option><option value="married">已婚</option><option value="divorced">離婚／分手後</option></select>
+      </div>
+      <div class="field"><label>解析年度</label>
+        <select id="f-year2">
+          <option value="2025">2025年</option><option value="2026" selected>2026年</option><option value="2027">2027年</option><option value="2028">2028年</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" onclick="runAnalysis()">✦ 開始解析命盤</button>
+  </div>
+
+  <div id="loading"><div class="spin"></div><p style="color:var(--mist);font-size:.88rem;letter-spacing:.08em">命盤推演中…</p></div>
+
+  <!-- RESULT PAGES -->
+  <div id="result-pages" class="pages">
+    <div class="export-bar">
+      <p id="r-title">靈數命盤報告</p>
+      <div style="display:flex;gap:8px">
+        <button class="ebtn" onclick="copyReport()">📋 複製</button>
+        <button class="ebtn" onclick="window.print()">🖨 列印</button>
+      </div>
+    </div>
+    <div class="page-nav" id="page-nav"></div>
+    <!-- pages injected by JS -->
+    <div id="pages-container"></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ CRM VIEW ══ -->
+<div id="crm" class="view">
+<div class="wrap">
+  <div class="crm-header">
+    <h2>客戶管理</h2>
+    <button class="crm-add" onclick="openAddClient()">＋ 新增客戶</button>
+  </div>
+  <div id="client-list"></div>
+</div>
+</div>
+
+<!-- ══ CLIENT MODAL ══ -->
+<div class="modal-bg" id="client-modal">
+  <div class="modal">
+    <h2 id="modal-title">新增客戶</h2>
+    <div class="row2">
+      <div class="field"><label>姓名</label><input type="text" id="c-name"></div>
+      <div class="field"><label>電話</label><input type="text" id="c-phone" placeholder="0912..."></div>
+    </div>
+    <div class="row3">
+      <div class="field"><label>出生年</label><input type="number" id="c-year" placeholder="1985"></div>
+      <div class="field"><label>出生月</label><input type="number" id="c-month" placeholder="6" min="1" max="12"></div>
+      <div class="field"><label>出生日</label><input type="number" id="c-day" placeholder="14" min="1" max="31"></div>
+    </div>
+    <div class="row1">
+      <div class="field"><label>備注</label><input type="text" id="c-note" placeholder="過敏、偏好、注意事項…"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+      <button class="modal-btn save" onclick="saveClient()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<div id="copy-buf" style="display:none;white-space:pre-wrap"></div>
 
 <script>
-// ======================
-// 基本設定
-// ======================
-const pageCount = 17;
-const pages = document.getElementById("pages");
-const nav = document.getElementById("nav");
-
-// ======================
-// 建立 17 頁
-// ======================
-for(let i=1;i<=pageCount;i++){
-  // nav button
-  let btn = document.createElement("button");
-  btn.innerText = "第" + i + "宮";
-  btn.onclick = (e)=>goPage("p"+i,e.target);
-  if(i===1) btn.classList.add("on");
-  nav.appendChild(btn);
-
-  // page
-  let div = document.createElement("div");
-  div.className = "page" + (i===1 ? " on":"");
-  div.id = "p"+i;
-
-  div.innerHTML = `
-    <h2>第 ${i} 宮</h2>
-
-    <div class="card">
-      <input placeholder="輸入此宮主題內容" id="input_${i}">
-      <button onclick="saveData(${i})">保存資料</button>
-    </div>
-
-    <div class="card">
-      <h3>AI 命盤解讀</h3>
-      <button onclick="aiRead(${i})">生成解讀</button>
-      <div id="ai_${i}">尚未生成</div>
-    </div>
-  `;
-
-  pages.appendChild(div);
+// ══════════════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════════════
+function goNav(id, el) {
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('on'); });
+  document.querySelectorAll('.nav a').forEach(function(a){ a.classList.remove('on'); });
+  document.getElementById(id).classList.add('on');
+  el.classList.add('on');
+  if(id==='crm') renderClients();
 }
 
-// ======================
-// 頁面切換
-// ======================
-function goPage(id,el){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('on'));
+// ══════════════════════════════════════════════════════
+// NUMEROLOGY CORE
+// ══════════════════════════════════════════════════════
+function r9(n){ while(n>9){ n=String(n).split('').reduce(function(a,b){return a+parseInt(b);},0); } return n; }
 
+function lifePath(y,m,d){
+  var s=0;
+  String(y).split('').forEach(function(c){s+=parseInt(c);});
+  String(m).padStart(2,'0').split('').forEach(function(c){s+=parseInt(c);});
+  String(d).padStart(2,'0').split('').forEach(function(c){s+=parseInt(c);});
+  return r9(s);
+}
+function palaceCounts(y,m,d){
+  var digits=[];
+  String(y).split('').forEach(function(c){digits.push(parseInt(c));});
+  String(m).padStart(2,'0').split('').forEach(function(c){digits.push(parseInt(c));});
+  String(d).padStart(2,'0').split('').forEach(function(c){digits.push(parseInt(c));});
+  var c={};for(var i=1;i<=9;i++) c[i]=0;
+  digits.forEach(function(x){if(x>0) c[x]++;});
+  return c;
+}
+function getConns(counts){
+  var p={};for(var k in counts){if(counts[k]>0)p[k]=true;}
+  return ["147","258","369","456","789","123","159","168","357"].filter(function(l){
+    return l.split('').every(function(n){return p[n];});
+  });
+}
+function getMiss(counts){ return Object.keys(counts).filter(function(k){return counts[k]===0;}).map(Number); }
+function yearFlow(y,m,d,ty){
+  var lp=lifePath(y,m,d);
+  var ys=0; String(ty).split('').forEach(function(c){ys+=parseInt(c);});
+  return r9(lp+ys);
+}
+function monthFlow(yf,mo){ return r9(yf+mo); }
+
+// Zodiac & Constellation
+function zodiac(y){
+  var z=['鼠','牛','虎','兔','龍','蛇','馬','羊','猴','雞','狗','豬'];
+  return z[(y-4)%12]+'年';
+}
+function constellation(m,d){
+  var c=[
+    [1,20,'摩羯'],[2,19,'水瓶'],[3,20,'雙魚'],[4,20,'牡羊'],[5,21,'金牛'],[6,21,'雙子'],
+    [7,23,'巨蟹'],[8,23,'獅子'],[9,23,'處女'],[10,23,'天秤'],[11,22,'天蠍'],[12,22,'射手'],[1,19,'摩羯']
+  ];
+  for(var i=0;i<c.length-1;i++){
+    var nm=c[i][0],nd=c[i][1],nn=c[i][2];
+    var xm=c[i+1][0],xd=c[i+1][1];
+    if((m===nm&&d>=nd)||(m===xm&&d<xd)) return nn+'座';
+  }
+  return '摩羯座';
+}
+
+// ══════════════════════════════════════════════════════
+// RULE DB
+// ══════════════════════════════════════════════════════
+var NUM={
+  1:{label:'獨立‧領導‧開創',
+     good:'自信、行動力強、有主見、開創精神旺盛',
+     bad:'容易固執、難以妥協、有時過於強勢',
+     fix:'練習傾聽他人意見，學會適時放手',
+     job:'創業、主管、業務、開拓型職位',
+     love:'需要有自己空間的伴侶，忌過度依賴型'},
+  2:{label:'合作‧感受‧包容',
+     good:'細膩敏感、善於溝通、體貼周到',
+     bad:'容易過度在意他人、缺乏安全感',
+     fix:'練習建立內在安全感，學會說不',
+     job:'輔導、諮詢、人資、服務業、公關',
+     love:'需要穩定安全感，與體貼型伴侶最合'},
+  3:{label:'表達‧創意‧樂觀',
+     good:'表達力強、創意豐沛、樂觀開朗',
+     bad:'容易分心、情緒起伏、難以深入',
+     fix:'培養專注力，深耕一個領域',
+     job:'教師、媒體、創作、業務、社群',
+     love:'需要欣賞與回應的伴侶，忌沉悶型'},
+  4:{label:'穩定‧責任‧實踐',
+     good:'踏實可靠、執行力強、重視承諾',
+     bad:'較為保守、難以應對突變、有時太鑽牛角尖',
+     fix:'練習彈性思維，接受不確定性',
+     job:'工程、財務、行政、建築、管理',
+     love:'重視承諾與安全感，適合穩定型伴侶'},
+  5:{label:'自由‧變化‧平衡',
+     good:'適應力強、充滿活力、多才多藝',
+     bad:'容易散漫、難以聚焦、怕被束縛',
+     fix:'練習聚焦與穩定，建立日常紀律',
+     job:'業務、旅遊、自由工作者、斜槓創業',
+     love:'需要自由空間，與獨立型伴侶最合'},
+  6:{label:'愛‧家庭‧照顧',
+     good:'責任感強、溫暖體貼、善於調和關係',
+     bad:'容易犧牲自我、過度付出、擔憂過多',
+     fix:'學會愛自己，設立健康的情感界線',
+     job:'醫療、教育、社工、療癒、美容養生',
+     love:'給予型，需要懂得感恩的伴侶'},
+  7:{label:'思考‧研究‧內省',
+     good:'深度思考、靈性敏感、洞察力強',
+     bad:'容易封閉、多疑、難以信任他人',
+     fix:'練習開放心態，學會接受不完美',
+     job:'研究、心理、技術、命理、靈性',
+     love:'需要深度交流的伴侶，重視靈魂契合'},
+  8:{label:'成就‧財富‧管理',
+     good:'目標明確、管理天賦、商業頭腦強',
+     bad:'容易太在意成就、忽略情感、過於強勢',
+     fix:'練習放鬆，在成就之外找到生命意義',
+     job:'企業管理、金融、投資、房地產',
+     love:'需要尊重其成就的伴侶，忌依附型'},
+  9:{label:'智慧‧奉獻‧慈悲',
+     good:'理想主義、有大格局、感受力極強、天生療癒者',
+     bad:'容易承擔他人情緒、內心孤獨、對感情太認真',
+     fix:'學習只為自己而活，建立情感界線',
+     job:'身心靈、療癒、推拿、藝術、靈性指導',
+     love:'感情認真深入，需要真正懂自己的人'}
+};
+
+var CONN={
+  "147":{name:'行動力線（權力線）',desc:'目標感強、執行力旺盛、天生有領導與開創能量。說到做到，適合創業或在需要快速推進的領域發揮。此連線同時帶有強烈的自我意志，要注意與他人的溝通方式。'},
+  "258":{name:'情感線',desc:'情感豐沛、同理心極強，對人際關係與情緒極為敏銳。天生的傾聽者與安慰者，適合服務、諮詢、療癒相關工作。但要注意不要吸收他人負能量過多。'},
+  "369":{name:'智慧線',desc:'學習力強、直覺準確、洞察人事物本質的能力極佳。很多做技術、命理、身體調理、能量療癒的人都有這條。你可能常常「一摸就知道哪裡有問題」。'},
+  "456":{name:'組織管理線',desc:'規劃能力與執行力兼具，適合管理職或獨立經營。能有效帶領團隊或管理資源，是天生的經營者。'},
+  "789":{name:'貴人線',desc:'人際緣分極佳，人生低潮時總有人拉一把。貴人往往不是親人，反而是客戶、女性、年長者或靈性圈的人。後運往往靠人脈與口碑發展。'},
+  "123":{name:'創造線（地軸線）',desc:'從行動到協調到表達，具備完整的創造能量。腳踏實地，適合建立長期穩健的事業，基礎紮實後爆發力強。'},
+  "159":{name:'成就線',desc:'從開創（1）到平衡（5）到智慧（9），是達成重大成就的完整路徑。人生往往在跌跌撞撞後，走出屬於自己的成功之路。'},
+  "168":{name:'財富線',desc:'行動力（1）帶動愛的能量（6）創造財富成就（8），財運能量較旺。主動出擊時財源更容易到來，適合以服務與愛心為核心的商業模式。'},
+  "357":{name:'精神探索線',desc:'創意（3）、平衡（5）、靈性（7）形成精神探索的連結，對生命本質有深度追求，具備哲學思維與靈性感知，適合在精神或療癒領域發展。'}
+};
+
+var MISS={
+  1:'缺1：你的一生課題是「學習自信與獨立決斷」。過去可能習慣依賴他人意見，或難以主動出擊。當你有意識地練習自主決策，缺1反而會成為你最大的突破點。',
+  2:'缺2：「溝通與感受他人」需要後天刻意培養。你外表能照顧別人，但其實不太會表達自己的脆弱。容易悶著、忍著、假裝沒事。學會傾聽與接受被照顧，是關鍵課題。',
+  3:'缺3：「表達與創意」需要鍛鍊。可能童年較少被鼓勵表達，一旦突破，表達能力將遠超常人。建議從寫日記或公開分享開始練習。',
+  4:'缺4：「規律與紀律」是需要後天建立的習慣。計畫多、執行少，難以維持日常穩定節奏。培養固定的生活與工作習慣，是最大的改善關鍵。',
+  5:'缺5：「平衡感與自我中心點」是此生課題。容易情緒被感情左右，遇到感情波動時工作也跟著亂。練習找到內在穩定的錨點，是一切的根本。',
+  6:'缺6：「愛與照顧自己」的能力需要有意識滋養。可能在情感上較為疏離，或容易忽略自己的需求。練習表達關愛、接受愛，是人際改善的核心。',
+  7:'缺7：「深度思考與內省」是學習功課。習慣快速行動而忽略內在整合，靜心冥想或系統性學習能讓決策品質大幅提升。',
+  8:'缺8：「管理與財富意識」需後天強化。對金錢可能有複雜心態，或不擅長商業規劃。建立清晰的財務目標與收支系統，能有效轉化此課題。',
+  9:'缺9：「大格局與理想精神」是此生發展方向。可能較專注於個人層面，難以看見更宏觀的視野。練習擴展格局、學會給予，將帶來深層的滿足感。'
+};
+
+var YEAR={
+  1:{t:'新開始‧播種',d:'九年循環的起點，啟動新計畫、建立新習慣的最佳時機。種下什麼，未來九年就收什麼。勇敢開創，不要等到完美才行動。'},
+  2:{t:'合作‧等待‧深化',d:'速度放緩，重點在關係的深化與合作的建立。耐心是最重要的功課，不宜強行推進，適合整合、等待與醞釀。'},
+  3:{t:'表達‧創意‧社交',d:'能量高漲，適合擴展人際、展示才華、學習新技能。靈感豐沛，把握機會表達自己、分享想法，讓更多人看見你。'},
+  4:{t:'建構‧紀律‧落實',d:'腳踏實地的一年，適合打地基、建制度、做系統性規劃。避免偷懶，踏實行動才能為未來累積真正的資本。'},
+  5:{t:'變化‧自由‧突破',d:'充滿變動與機遇，擁抱改變，嘗試新事物，突破舊有框架。彈性應對突發狀況，才能抓住這一年的紅利。'},
+  6:{t:'責任‧家庭‧愛',d:'家庭與關係是重點，可能承擔更多責任。以愛為出發點的付出將帶來深層滿足，適合在家庭或社群中發揮影響力。'},
+  7:{t:'內省‧深化‧靈性',d:'向內收斂，深化學習與思考。靜心、研究、精進技術是今年的主旋律。放慢外在步伐，才能獲得更深層的智慧與力量。'},
+  8:{t:'收穫‧財富‧成就',d:'努力終於可以看到回報，財運與成就運較旺。適合推進事業、談判合作、展現實力。主動出擊，收割過去努力的果實。'},
+  9:{t:'結束‧釋放‧圓滿',d:'九年循環的終點，適合清理、放下、總結。讓不再適合的人事物自然離去，為下一個新循環騰出空間與能量。'}
+};
+
+var MONTH_TIPS=[
+  '整頓內部，謹慎行事，沉澱規劃',
+  '啟動新計畫，積極播種，勇敢出擊',
+  '合作洽談，深化關係，溝通推進',
+  '新挑戰來臨，迎難而上，拓展資源',
+  '謹言慎行，避免口舌是非，情緒管理',
+  '動口生財，注意開銷，開源節流',
+  '向內沉澱，精進技術，累積實力',
+  '整理收尾，建立人脈，多社交拓展',
+  '新生能量，把握機遇，展示自己',
+  '社交擴展，展示才能，人際突破',
+  '深化合作，推進重要事項，有貴人',
+  '沉澱總結，財務整理，為明年布局'
+];
+
+// ══════════════════════════════════════════════════════
+// GENERATE PAGES
+// ══════════════════════════════════════════════════════
+var G={};
+
+function runAnalysis(){
+  var name=document.getElementById('f-name').value.trim()||'（未填姓名）';
+  var gender=document.getElementById('f-gender').value;
+  var y=parseInt(document.getElementById('f-year').value);
+  var m=parseInt(document.getElementById('f-month').value);
+  var d=parseInt(document.getElementById('f-day').value);
+  var status=document.getElementById('f-status').value;
+  var ty=parseInt(document.getElementById('f-year2').value);
+
+  if(!y||!m||!d){ alert('請選擇完整的出生年月日'); return; }
+
+  document.getElementById('loading').classList.add('on');
+  document.getElementById('result-pages').classList.remove('on');
+
+  setTimeout(function(){
+    var lp=lifePath(y,m,d);
+    var inn=r9(m+d);
+    var acq=r9(String(y).split('').reduce(function(a,b){return a+parseInt(b);},0));
+    var pers=r9(d);
+    var dest=r9(y+m+d);
+    var birth=r9(d);
+    var counts=palaceCounts(y,m,d);
+    var conns=getConns(counts);
+    var miss=getMiss(counts);
+    var yf=yearFlow(y,m,d,ty);
+    var zo=zodiac(y);
+    var cons=constellation(m,d);
+    var smap={single:'單身',dating:'交往中',married:'已婚',divorced:'離婚／分手後'};
+
+    G={name:name,gender:gender,y:y,m:m,d:d,status:smap[status],ty:ty,
+       lp:lp,inn:inn,acq:acq,pers:pers,dest:dest,birth:birth,
+       counts:counts,conns:conns,miss:miss,yf:yf,zo:zo,cons:cons};
+
+    buildPages();
+    document.getElementById('r-title').textContent=name+'｜'+y+'/'+m+'/'+d+' 靈數命盤';
+    document.getElementById('loading').classList.remove('on');
+    document.getElementById('result-pages').classList.add('on');
+    buildCopy();
+  },600);
+}
+
+var PAGE_DEFS=[
+  {id:'p1',label:'基本資料'},
+  {id:'p2',label:'九宮格'},
+  {id:'p3',label:'數字能量'},
+  {id:'p4',label:'缺數分析'},
+  {id:'p5',label:'連線能量'},
+  {id:'p6',label:'性格分析'},
+  {id:'p7',label:'財運'},
+  {id:'p8',label:'感情婚姻'},
+  {id:'p9',label:'健康'},
+  {id:'p10',label:'事業'},
+  {id:'p11',label:'人生課題'},
+  {id:'p12',label:'天賦排行'},
+  {id:'p13',label:'流年'},
+  {id:'p14',label:'流月'},
+  {id:'p15',label:'AI總結'},
+  {id:'p16',label:'元辰宮'},
+  {id:'p17',label:'建議'}
+];
+
+function buildPages(){
+  // Nav
+  var nav=document.getElementById('page-nav');
+  nav.innerHTML='';
+  PAGE_DEFS.forEach(function(p,i){
+    var b=document.createElement('button');
+    b.className='pnav-btn'+(i===0?' on':'');
+    b.textContent=p.label;
+    b.setAttribute('onclick','goPage("'+p.id+'",this)');
+    nav.appendChild(b);
+  });
+
+  var con=document.getElementById('pages-container');
+  con.innerHTML='';
+  PAGE_DEFS.forEach(function(p,i){
+    var div=document.createElement('div');
+    div.id=p.id;
+    div.className='page'+(i===0?' on':'');
+    div.innerHTML=genPage(p.id);
+    con.appendChild(div);
+  });
+}
+
+function goPage(id,el){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.pnav-btn').forEach(function(b){b.classList.remove('on');});
   document.getElementById(id).classList.add('on');
   el.classList.add('on');
 }
 
-// ======================
-// 保存資料（永久）
-// ======================
-function saveData(i){
-  const val = document.getElementById("input_"+i).value;
-  localStorage.setItem("mingpan_"+i, val);
-  alert("已保存第 "+i+" 宮資料");
+function sec(icon,title,body){
+  return '<div class="sec"><div class="sec-head"><div class="sec-icon">'+icon+'</div>'+title+'</div><div class="sec-body">'+body+'</div></div>';
 }
 
-// ======================
-// 載入資料
-// ======================
-function loadData(){
-  for(let i=1;i<=pageCount;i++){
-    let val = localStorage.getItem("mingpan_"+i);
-    if(val){
-      let input = document.getElementById("input_"+i);
-      if(input) input.value = val;
+function genPage(id){
+  var g=G;
+  var html='';
+
+  if(id==='p1'){
+    html+=sec('一','基本資料',
+      '<div class="bnum-row">'+
+      item('生命靈數',g.lp,'g')+
+      item('先天數',g.inn,'j')+
+      item('後天數',g.acq,'j')+
+      item('人格數',g.pers,'j')+
+      item('生日數',g.birth,'j')+
+      item('命運數',g.dest,'j')+
+      '</div>'+
+      '<p><strong>姓名：</strong>'+g.name+'　<strong>性別：</strong>'+(g.gender==='female'?'女性':'男性')+'　<strong>感情狀態：</strong>'+g.status+'</p>'+
+      '<p><strong>生日：</strong>'+g.y+' 年 '+g.m+' 月 '+g.d+' 日</p>'+
+      '<p><strong>生肖：</strong>'+g.zo+'　<strong>星座：</strong>'+g.cons+'</p>'+
+      '<p><strong>解析年度：</strong>'+g.ty+'年　<strong>流年數：</strong>'+g.yf+'（'+YEAR[g.yf].t+'）</p>'
+    );
+  }
+
+  if(id==='p2'){
+    html+=sec('二','九宮格命盤',genPalace(g.counts,g.miss));
+  }
+
+  if(id==='p3'){
+    var body='';
+    for(var i=1;i<=9;i++){
+      var cnt=g.counts[i];
+      var n=NUM[i];
+      var stars=cnt===0?'○ 缺數':cnt===1?'★★★☆☆':cnt===2?'★★★★☆':'★★★★★';
+      body+='<div style="border:1px solid var(--border);border-radius:4px;padding:12px 14px;margin-bottom:10px;">';
+      body+='<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px;">';
+      body+='<span style="font-family:\'Noto Serif TC\',serif;font-size:1.6rem;font-weight:900;color:'+(cnt===0?'#e0c4bc':'var(--gold)')+';">'+i+'</span>';
+      body+='<span style="font-size:.85rem;font-weight:700;color:var(--jade);">'+n.label+'</span>';
+      body+='<span style="color:var(--gold);font-size:.85rem;">'+stars+'</span>';
+      if(cnt>=2) body+='<span class="chip j">×'+cnt+'</span>';
+      body+='</div>';
+      body+='<p><strong>優點：</strong>'+n.good+'</p>';
+      body+='<p><strong>挑戰：</strong>'+n.bad+'</p>';
+      body+='<p><strong>建議：</strong>'+n.fix+'</p>';
+      body+='</div>';
     }
-  }
-}
-
-// ======================
-// AI 解讀（先做本地版）
-// ======================
-function aiRead(i){
-  let val = document.getElementById("input_"+i).value;
-
-  let result = "";
-
-  if(!val){
-    result = "請先輸入內容再生成解讀。";
-  }else{
-    result =
-    "🔮 AI 命盤分析：\n\n" +
-    "根據此宮輸入內容：「" + val + "」\n\n" +
-    "解讀方向：\n" +
-    "1. 此宮能量正在變動\n" +
-    "2. 建議注意人際與決策\n" +
-    "3. 若持續加強，可提升運勢流動\n\n" +
-    "（此為本地AI模型，之後可升級API版）";
+    html+=sec('三','數字能量分析',body);
   }
 
-  document.getElementById("ai_"+i).innerText = result;
+  if(id==='p4'){
+    var body='';
+    if(g.miss.length===0){
+      body='<p>✦ 1～9 全數具備，命盤能量完整圓滿，各方面天賦均衡發展。</p>';
+    } else {
+      g.miss.forEach(function(n){
+        body+='<div class="conn" style="background:#fff5f3;border-color:#f0c8c0;margin-bottom:12px;">';
+        body+='<div class="conn-t" style="color:var(--rust);">缺 '+n+'｜'+NUM[n].label+'</div>';
+        body+='<div class="conn-d">'+MISS[n]+'</div></div>';
+      });
+    }
+    html+=sec('四','缺數分析',body);
+  }
+
+  if(id==='p5'){
+    var body='';
+    if(g.conns.length===0){
+      body='<p style="color:var(--mist)">命盤目前尚未形成完整連線，各數字能量獨立運作。適合專注於單一核心領域深耕，讓個別數字的特質充分發揮。</p>';
+      // Show which almost-connections exist
+      var almost=["147","258","369","456","789","123","159","168","357"].filter(function(l){
+        var has=l.split('').filter(function(n){return g.counts[n]>0;}).length;
+        return has===2;
+      });
+      if(almost.length>0){
+        body+='<p style="margin-top:10px;font-size:.82rem;color:var(--mist)"><strong>差一步的連線：</strong>'+almost.join('、')+'（補足缺數即可啟動）</p>';
+      }
+    } else {
+      g.conns.forEach(function(l){
+        var c=CONN[l];
+        body+='<div class="conn"><div class="conn-t">'+l.split('').join(' — ')+'　'+c.name+'</div><div class="conn-d">'+c.desc+'</div></div>';
+      });
+    }
+    // All connections reference
+    body+='<div style="margin-top:14px;padding:12px;background:var(--gold-pale);border-radius:4px;font-size:.78rem;color:#5a4010;line-height:1.8;">';
+    body+='<strong>連線能量總覽：</strong><br>';
+    Object.keys(CONN).forEach(function(k){body+='<span style="margin-right:12px;">'+k+' '+CONN[k].name+'</span>';});
+    body+='</div>';
+    html+=sec('五','連線能量分析',body);
+  }
+
+  if(id==='p6'){
+    var n=NUM[g.lp];
+    var connStr=g.conns.length?g.conns.map(function(c){return CONN[c].name;}).join('、'):'無完整連線';
+    var missStr=g.miss.length?g.miss.join('、'):'無缺數';
+    var body='<p>你的核心主數是 <strong style="color:var(--gold);font-size:1.1rem;">'+g.lp+'</strong>（'+n.label+'）</p>';
+    body+='<p style="margin-top:8px">'+n.good+'。'+n.bad+'</p>';
+    if(g.conns.includes('369')){
+      body+='<p style="margin-top:10px">你的命盤有 <strong>369 智慧線</strong>，洞察力強，看人準確，直覺敏銳。你可能常常「一摸就知道哪裡有問題」，甚至客人還沒開口，你就已經感覺到了。</p>';
+    }
+    if(g.conns.includes('789')){
+      body+='<p style="margin-top:10px">你的命盤有 <strong>789 貴人線</strong>，人生低潮時總有人拉你一把。貴人往往不是親人，而是客戶、女性、年長者或靈性圈的人。後半人生靠口碑與人脈發展。</p>';
+    }
+    if(g.miss.includes(2)){
+      body+='<p style="margin-top:10px"><strong>缺2</strong>：外表能照顧別人，但不太會表達自己的脆弱。容易悶著、忍著、假裝沒事。感情裡容易「我付出很多，但沒被真正接住」。</p>';
+    }
+    if(g.miss.includes(5)){
+      body+='<p style="margin-top:10px"><strong>缺5</strong>：中心平衡感是課題。情緒容易被感情影響，遇到感情波動工作也會跟著亂。因為你不是純事業型人格，而是「情感能量型人格」。當心穩，運就穩。</p>';
+    }
+    body+='<p style="margin-top:12px">命盤連線：<strong>'+connStr+'</strong>　缺數：<strong>'+(g.miss.length?'缺'+missStr:'無缺數')+'</strong></p>';
+    html+=sec('六','性格深度分析',body);
+  }
+
+  if(id==='p7'){
+    var wstyle={
+      1:'靠獨立開創賺錢，越主動收入越高，適合自行創業。',
+      2:'財運與人際綁定，合夥或服務類工作財源更穩。',
+      3:'靠才華與創意變現，口碑與品牌是最強財富工具。',
+      4:'穩健理財型，長期累積勝於短期暴富，定期定額投資最適合。',
+      5:'財富起伏較大，多元收入來源是關鍵，需避免衝動消費。',
+      6:'財運與服務他人有關，從事照顧、美容、療癒類財運更旺。',
+      7:'靠專業與知識變現，適合建立被動收入，不適合短線操作。',
+      8:'天生商業嗅覺，投資與管理能力強，財富潛力極大。',
+      9:'財富往往在付出後回流，從事靈性、教育、療癒類更能帶動收入。'
+    };
+    var body='<p><strong>你的賺錢模式：</strong>'+wstyle[g.lp]+'</p>';
+    body+='<p style="margin-top:8px"><strong>'+g.ty+'年流年'+g.yf+'財運提示：</strong>'+YEAR[g.yf].d+'</p>';
+    body+='<p style="margin-top:8px"><strong>是否適合合夥：</strong>'+([2,6,9].includes(g.lp)?'適合，具備合作天賦，與互補型夥伴合作效果最好。':'需謹慎評估，獨立運作時往往效率更高。')+'</p>';
+    body+='<p><strong>財運高峰月份（'+g.ty+'年）：</strong>'+[3,6,8,11].map(function(mo){return mo+'月（流月'+monthFlow(g.yf,mo)+'）';}).join('、')+'</p>';
+    if(g.conns.includes('168')) body+='<p style="margin-top:8px">✦ 命盤有 <strong>168 財富線</strong>，主動出擊時財源更容易到來。</p>';
+    if(g.conns.includes('456')) body+='<p>✦ 命盤有 <strong>456 組織管理線</strong>，透過系統化管理可大幅提升收益。</p>';
+    body+='<p style="margin-top:10px;font-size:.78rem;color:var(--mist)">※ 以上為命理角度的參考，不作為投資理財決策依據。</p>';
+    html+=sec('七','財運分析',body);
+  }
+
+  if(id==='p8'){
+    var lmap={
+      1:'傾向主動追求，有自己的節奏，有時難以妥協，需要有空間的伴侶。',
+      2:'細膩體貼，非常在乎對方感受，容易付出過多而委屈自己。',
+      3:'浪漫且口才佳，喜歡用語言表達愛意，需要欣賞與回應的伴侶。',
+      4:'重視安全感與承諾，踏實守護型，情感表達較為含蓄。',
+      5:'渴望自由的同時也渴望愛，需要彈性空間，忌被束縛。',
+      6:'給予型的愛，容易為對方犧牲，需要學習愛自己。',
+      7:'不輕易敞開心扉，但一旦信任，是深情而忠誠的伴侶。',
+      8:'在愛情中也有主導欲，需要尊重其能力與成就的伴侶。',
+      9:'感情一旦認真會很深，但也因為太深容易受傷。一直在找真正懂自己的人。'
+    };
+    var pmf=([1,3,5].includes(g.yf)||g.yf===8)?'今年能量較活躍，適合主動擴展社交圈，桃花出現機率較高。':'今年能量偏向內修，感情不宜強求，做好自己是最大的吸引力。';
+    var body='<p><strong>感情狀態：</strong>'+g.status+'</p>';
+    body+='<p style="margin-top:8px"><strong>你的感情模式：</strong>'+lmap[g.lp]+'</p>';
+    if(g.status==='單身'){
+      body+='<p style="margin-top:8px"><strong>桃花運（'+g.ty+'）：</strong>'+pmf+'</p>';
+      body+='<p><strong>容易吸引的對象：</strong>'+([2,6,9].includes(g.lp)?'溫柔體貼、情感細膩的人':[1,4,8].includes(g.lp)?'有主見、能力強、穩定的人':'靈性共鳴、興趣相近的人')+'</p>';
+      body+='<p><strong>容易遇到的課題：</strong>'+NUM[g.lp].bad.split('、').slice(0,2).join('，')+（g.miss.includes(2)?'，加上缺2容易在感情中悶著不說':'')+'</p>';
+    } else if(g.status==='已婚'){
+      body+='<p style="margin-top:8px"><strong>'+g.ty+'年婚姻能量：</strong>'+YEAR[g.yf].d+'</p>';
+      body+='<p><strong>建議：</strong>'+([4,6,8].includes(g.yf)?'今年適合共同規劃家庭財務，一起做決定能增加夫妻默契。':'保持生活新鮮感，安排共同體驗，為感情注入活力。')+'</p>';
+    } else {
+      body+='<p style="margin-top:8px"><strong>'+g.ty+'年感情能量：</strong>'+YEAR[g.yf].d+'</p>';
+      body+='<p><strong>建議：</strong>'+([4,6,8].includes(g.yf)?'今年是推進感情承諾的好時機。':'今年先深化感情基礎，水到渠成。')+'</p>';
+    }
+    body+='<p style="margin-top:10px;font-size:.78rem;color:var(--mist)">※ 以上為命理角度的參考，不構成感情建議。</p>';
+    html+=sec('八','感情與婚姻',body);
+  }
+
+  if(id==='p9'){
+    var hz={1:'心臟與循環系統',2:'腸胃與消化系統',3:'呼吸系統與肺部',4:'骨骼、脊椎與關節',5:'神經系統與腎臟',6:'生殖系統與荷爾蒙',7:'腦神經與睡眠品質',8:'肝臟與血液系統',9:'淋巴與免疫系統'};
+    var body='<p><strong>需重點關注的部位：</strong>'+hz[g.lp]+'</p>';
+    body+='<p style="margin-top:8px"><strong>'+g.ty+'年健康提示：</strong>'+([5,8,1].includes(g.yf)?'今年能量強但容易過度燃燒，注意不要讓身體長期透支。':[2,7].includes(g.yf)?'今年情緒能量較敏感，心理壓力容易轉化成身體症狀。':'今年整體健康能量平穩，維持規律作息即可。')+'</p>';
+    body+='<p style="margin-top:10px"><strong>養生建議：</strong></p>';
+    body+='<p>① 規律作息，固定睡眠時間</p><p>② 每週3次中等強度運動</p><p>③ 減少精製糖與加工食品</p><p>④ 每天補充足夠水分</p><p>⑤ 定期安排身體調理或舒壓療程</p>';
+    body+='<p style="margin-top:10px;font-size:.78rem;color:var(--mist)">※ 以上屬命理角度參考，不作為醫療診斷，身體不適請就醫。</p>';
+    html+=sec('九','健康提醒',body);
+  }
+
+  if(id==='p10'){
+    var cg={1:'創業、主管、開拓型職位，最適合做自己的老闆',2:'輔導、諮詢、人資、服務業，善用傾聽與溝通能力',3:'教學、媒體、創作、社群經營，表達力是最大資產',4:'工程、財務、行政、建築，踏實執行是核心競爭力',5:'業務、旅遊、自由工作者、多元斜槓',6:'醫療、社工、教育、療癒、美容養生，天生照顧者氣質',7:'研究、心理、技術、命理、靈性，深度思考是最強武器',8:'企業管理、金融、投資、房地產，具備大格局成就潛力',9:'身心靈、療癒、推拿、藝術、靈性指導，使命感驅動最大能量'};
+    var body='<p><strong>最適合的工作方向：</strong>'+cg[g.lp]+'</p>';
+    body+='<p style="margin-top:8px"><strong>你的核心優勢：</strong>'+NUM[g.lp].good+'</p>';
+    if(g.conns.length){
+      body+='<p style="margin-top:8px"><strong>連線加持：</strong>';
+      g.conns.forEach(function(c){body+='【'+CONN[c].name+'】';});
+      body+='</p>';
+    }
+    body+='<p style="margin-top:8px"><strong>'+g.ty+'年事業運：</strong>'+YEAR[g.yf].d+'</p>';
+    body+='<p><strong>今年最適合的行動：</strong>'+([1,5].includes(g.yf)?'啟動新項目、接受新挑戰、拓展業務版圖':[3,8].includes(g.yf)?'推廣品牌、展示實力、收割過去努力的成果':[2,6].includes(g.yf)?'深化合作關係、優化現有業務':'精進技術、沉澱思考、為下一個成長期做準備')+'</p>';
+    html+=sec('十','事業與天賦',body);
+  }
+
+  if(id==='p11'){
+    var body='<p>你的最大課題，不是能力。</p>';
+    body+='<p style="margin-top:8px">你其實有能力。</p>';
+    body+='<p style="margin-top:8px">而是：「'+([9,6,2].includes(g.lp)?'太容易把自己的價值，建立在被需要上。':[1,8,4].includes(g.lp)?'太在意成就與結果，忘了享受過程。':'太容易把自己的情緒壓下去，假裝沒事。')+'」</p>';
+    if(g.miss.includes(5)){
+      body+='<p style="margin-top:8px">缺5的你，中心平衡感是核心課題。當感情波動，工作也容易跟著亂。你是「情感能量型人格」——當心穩，運就穩。</p>';
+    }
+    body+='<p style="margin-top:8px">你的命格比較像「後運型」。</p>';
+    body+='<p>年輕時辛苦，中年後才慢慢走出自己的價值。</p>';
+    body+='<p style="margin-top:8px">你的運不是爆發型，是：<strong>口碑累積型。</strong></p>';
+    body+='<p style="margin-top:8px">一旦你願意：曝光、社交、經營個人品牌，運會差很多。</p>';
+    body+='<p style="margin-top:10px"><strong>此生最重要的三件事：</strong></p>';
+    body+='<p>① '+NUM[g.lp].fix+'</p>';
+    body+='<p>② '+(g.miss.length?'有意識培養缺數能量（缺'+g.miss.join('、')+'）':'善用完整的九宮格能量')+'</p>';
+    body+='<p>③ '+([9,6,2].includes(g.lp)?'學會先愛自己，再去愛別人':[1,8].includes(g.lp)?'在成就之外找到真正的生命意義':'在行動與沉澱之間找到自己的節奏')+'</p>';
+    html+=sec('十一','人生課題',body);
+  }
+
+  if(id==='p12'){
+    var gifts=[
+      {n:NUM[g.lp].job.split('、')[0],s:5},
+      {n:g.conns.length?CONN[g.conns[0]].name.split('（')[0]:'洞察',s:5},
+      {n:'溝通與人際',s:g.miss.includes(2)?3:4},
+      {n:'創意表達',s:g.counts[3]>=1?4:3},
+      {n:'領導管理',s:g.conns.includes('456')||g.conns.includes('147')?5:3},
+      {n:'靈性療癒',s:[7,9,6].includes(g.lp)||g.conns.includes('369')?5:3},
+      {n:'財務規劃',s:[4,8].includes(g.lp)||g.conns.includes('168')?4:3},
+      {n:'學習研究',s:g.conns.includes('369')?5:[7,3].includes(g.lp)?4:3}
+    ];
+    gifts.sort(function(a,b){return b.s-a.s;});
+    var body='';
+    gifts.slice(0,6).forEach(function(gf){
+      var stars='';
+      for(var i=0;i<5;i++) stars+=(i<gf.s?'⭐':'☆');
+      body+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><span style="width:80px;font-size:.85rem;font-weight:700;">'+gf.n+'</span><span style="font-size:1rem;letter-spacing:2px;">'+stars+'</span></div>';
+    });
+    html+=sec('十二','天賦排行榜',body);
+  }
+
+  if(id==='p13'){
+    var yr=YEAR[g.yf];
+    var body='<div style="text-align:center;margin-bottom:16px;">';
+    body+='<div style="font-size:.75rem;color:var(--mist);margin-bottom:4px;">'+g.ty+' 流年數</div>';
+    body+='<div style="font-family:\'Noto Serif TC\',serif;font-size:3.5rem;font-weight:900;color:var(--gold);line-height:1;">'+g.yf+'</div>';
+    body+='<div style="font-size:.9rem;font-weight:700;color:var(--jade);margin-top:4px;">'+yr.t+'</div></div>';
+    body+='<p>'+yr.d+'</p>';
+    body+='<p style="margin-top:10px"><strong>今年的核心行動方向：</strong></p>';
+    body+='<p>'+([1,5,8].includes(g.yf)?'主動出擊，不要等待時機，機會要自己創造。':[3,6,9].includes(g.yf)?'深化關係與表達，連結是今年最大的財富。':'沉澱精進，把根扎深，厚積才能薄發。')+'</p>';
+    body+='<p style="margin-top:10px"><strong>工作：</strong>'+([1,3,5,8].includes(g.yf)?'積極進攻，有機會拓展版圖':'鞏固現有，培養深度')+'</p>';
+    body+='<p><strong>感情：</strong>'+([1,3,6].includes(g.yf)?'桃花較旺，主動社交有機會':'感情宜穩定，重質不重量')+'</p>';
+    body+='<p><strong>財運：</strong>'+([1,3,5,8].includes(g.yf)?'財運積極，可布局新收入來源':'守成為主，避免大額投資')+'</p>';
+    body+='<p><strong>健康：</strong>'+([5,8,1].includes(g.yf)?'注意過勞，適時休息':'能量較穩，維持規律即可')+'</p>';
+    html+=sec('十三','流年 '+g.ty,body);
+  }
+
+  if(id==='p14'){
+    var body='<p style="margin-bottom:12px;"><strong>'+g.ty+'年 流月能量總覽</strong>（流年數：'+g.yf+'）</p>';
+    body+='<table class="tbl"><thead><tr><th>月份</th><th>流月數</th><th>主題</th><th>本月建議</th></tr></thead><tbody>';
+    for(var mo=1;mo<=12;mo++){
+      var mf=monthFlow(g.yf,mo);
+      body+='<tr><td><span class="mn">'+mo+'月</span></td><td><span class="mf">'+mf+'</span></td><td>'+NUM[mf].label+'</td><td>'+MONTH_TIPS[mo-1]+'</td></tr>';
+    }
+    body+='</tbody></table>';
+    html+=sec('十四','流月 '+g.ty+'年',body);
+  }
+
+  if(id==='p15'){
+    var connNames=g.conns.length?g.conns.map(function(c){return CONN[c].name;}).join('、'):'';
+    var body='<p>你的 '+g.ty+' 年，最大的重點是——</p>';
+    body+='<p style="margin-top:8px;font-family:\'Noto Serif TC\',serif;font-size:1rem;font-weight:700;color:var(--jade);">'+YEAR[g.yf].t+'</p>';
+    body+='<p style="margin-top:8px">'+YEAR[g.yf].d+'</p>';
+    body+='<p style="margin-top:12px"><strong>你的優勢：</strong></p>';
+    body+='<p>'+NUM[g.lp].good+(connNames?'。命盤連線能量加持：'+connNames:'')+'</p>';
+    body+='<p style="margin-top:10px"><strong>你的弱點：</strong></p>';
+    body+='<p>'+NUM[g.lp].bad+(g.miss.length?'。需有意識培養缺數'+g.miss.join('、')+'的能量':'')+'</p>';
+    body+='<p style="margin-top:10px"><strong>今年最值得做的三件事：</strong></p>';
+    body+='<p>① '+([1,5,8].includes(g.yf)?'主動拓展，播下新種子，不要等完美才出發':'沉澱與精進，把現有的做深做好')+'</p>';
+    body+='<p>② 善用自己的天賦：'+NUM[g.lp].job.split('、')[0]+NUM[g.lp].job.split('、')[1]||''+'</p>';
+    body+='<p>③ '+NUM[g.lp].fix+'</p>';
+    html+=sec('十五','AI 總結', body);
+  }
+
+  if(id==='p16'){
+    var places=['翠林','湖畔','花園','山丘','海邊','古宮','草原','雲端'];
+    var elems=['水晶','桂花','竹林','山泉','玫瑰','松木','薰衣草','梅花'];
+    var idx=((g.lp-1)+g.miss.length)%8;
+    var place=places[idx];
+    var elem=elems[(idx+2)%8];
+    var body='<p style="font-size:.82rem;color:var(--mist);margin-bottom:12px;">※ 元辰宮為創意性命理詮釋，屬娛樂性內容，不具備客觀預測能力。</p>';
+    body+='<p>你的元辰宮場景是——</p>';
+    body+='<p style="font-family:\'Noto Serif TC\',serif;font-size:1.1rem;font-weight:700;color:var(--jade);margin:8px 0;">'+place+'中的'+elem+'宮殿</p>';
+    body+='<p>這裡的氛圍：安靜、深邃、帶著一股說不清楚的美感。像你這個人——表面平靜，但內在有很多正在流動的東西。</p>';
+    body+='<p style="margin-top:10px"><strong>財庫：</strong>'+([4,8,1].includes(g.lp)?'財庫寬敞，但需要主動管理，才能讓財富留住。':'財庫在後院，需要靠口碑與信任慢慢累積。')+'</p>';
+    body+='<p><strong>桃花：</strong>'+([2,6,9].includes(g.lp)?'桃花旺，但容易遇到靈魂契合卻現實條件複雜的緣分。':'桃花較慢開，但一旦開了往往是認真的緣分。')+'</p>';
+    body+='<p><strong>健康能量：</strong>'+([7,4].includes(g.lp)?'需要定期淨化，避免壓力累積在身體。':'整體能量穩定，維持規律的調理即可。')+'</p>';
+    body+='<p><strong>元辰宮建議：</strong>多接觸大自然，定期靜心，讓自己有充電的時間與空間。</p>';
+    html+=sec('十六','元辰宮（創意詮釋）',body);
+  }
+
+  if(id==='p17'){
+    var body='<p>現在最值得努力的，</p>';
+    body+='<p>不只是一直賺錢，</p>';
+    body+='<p style="margin-top:8px">而是——</p>';
+    body+='<p style="font-family:\'Noto Serif TC\',serif;font-size:1rem;font-weight:700;color:var(--jade);margin-top:8px;">打造屬於你的品牌與口碑系統。</p>';
+    body+='<p style="margin-top:10px">你的運是「口碑累積型」。</p>';
+    body+='<p>每一個真正被你服務到的人，都是你最強的行銷。</p>';
+    body+='<p style="margin-top:10px"><strong>接下來的行動建議：</strong></p>';
+    body+='<p>① 整理一份清晰的服務介紹，讓客人能輕鬆分享給朋友</p>';
+    body+='<p>② 建立固定的社群更新頻率，讓人感覺到你的存在</p>';
+    body+='<p>③ 每個月主動聯繫3位舊客人，感情經營不輸新開發</p>';
+    body+='<p>④ '+YEAR[g.yf].t+'的'+g.ty+'年，'+YEAR[g.yf].d+'</p>';
+    body+='<p style="margin-top:10px">記住：你不是靠爆發賺錢的人，你是靠信任賺錢的人。</p>';
+    body+='<p>信任，需要時間，但一旦建立，就很難被取代。</p>';
+    html+=sec('十七','AI 人生建議',body);
+  }
+
+  return html;
 }
 
-// ======================
-// 初始化
-// ======================
-loadData();
+function item(label,val,cls){
+  return '<div class="bnum-item '+(cls||'')+'"><div class="bl">'+label+'</div><div class="bv">'+val+'</div></div>';
+}
+
+function genPalace(counts,miss){
+  var ORDER=[7,8,9,4,5,6,1,2,3];
+  var missSet={};miss.forEach(function(n){missSet[n]=true;});
+  var html='<div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;">';
+  html+='<div class="palace">';
+  ORDER.forEach(function(pos){
+    var cnt=counts[pos];
+    var cls='pc';
+    if(cnt===0) cls+=' miss';
+    else if(cnt>=2) cls+=' multi';
+    html+='<div class="'+cls+'"><span class="pnum">'+pos+'</span><span class="pval">'+(cnt===0?'○':String(pos).repeat(Math.min(cnt,4)))+'</span></div>';
+  });
+  html+='</div>';
+  html+='<div style="flex:1;min-width:150px;">';
+  html+='<div style="font-size:.78rem;color:var(--mist);line-height:2;margin-bottom:8px;"><span style="color:var(--gold)">●</span> 金色＝出現<br><span style="color:var(--jade)">●</span> 綠色＝重複<br><span style="color:#e8c4b8">●</span> 淡粉＝缺數</div>';
+  if(miss.length){
+    html+='<div style="margin-bottom:6px;font-size:.78rem;font-weight:700;color:var(--rust);">缺數：</div>';
+    html+='<div class="chip-row">';
+    miss.forEach(function(n){html+='<span class="chip r">缺'+n+'</span>';});
+    html+='</div>';
+  } else {
+    html+='<p style="font-size:.8rem;color:var(--jade);">✦ 1～9 全數具備</p>';
+  }
+  var multi=Object.keys(counts).filter(function(k){return counts[k]>=2;});
+  if(multi.length){
+    html+='<div style="margin-top:8px;font-size:.78rem;font-weight:700;color:var(--jade);">強化數：</div>';
+    html+='<div class="chip-row">';
+    multi.forEach(function(k){html+='<span class="chip j">'+k+'×'+counts[k]+'</span>';});
+    html+='</div>';
+  }
+  html+='</div></div>';
+  return html;
+}
+
+// ══════════════════════════════════════════════════════
+// COPY
+// ══════════════════════════════════════════════════════
+function buildCopy(){
+  var g=G;
+  var t='靈數命盤完整報告\n';
+  t+='姓名：'+g.name+'　生日：'+g.y+'/'+g.m+'/'+g.d+'　'+g.status+'\n';
+  t+='生命靈數：'+g.lp+'（'+NUM[g.lp].label+'）　流年'+g.ty+'：'+g.yf+'（'+YEAR[g.yf].t+'）\n';
+  t+='缺數：'+(g.miss.length?g.miss.join('、'):'無')+'　連線：'+(g.conns.length?g.conns.join('、'):'無')+'\n\n';
+  t+='◆ 性格\n'+NUM[g.lp].good+'\n\n';
+  t+='◆ 財運\n靠'+NUM[g.lp].job.split('、')[0]+'方向發展，流年'+g.yf+'（'+YEAR[g.yf].t+'）：'+YEAR[g.yf].d+'\n\n';
+  t+='◆ '+g.ty+'流月\n';
+  for(var mo=1;mo<=12;mo++){
+    var mf=monthFlow(g.yf,mo);
+    t+=mo+'月 流月'+mf+'（'+NUM[mf].label+'）：'+MONTH_TIPS[mo-1]+'\n';
+  }
+  t+='\n◆ 建議\n'+YEAR[g.yf].d;
+  document.getElementById('copy-buf').textContent=t;
+}
+function copyReport(){
+  var t=document.getElementById('copy-buf').textContent;
+  if(!t.trim()){alert('請先解析命盤');return;}
+  navigator.clipboard.writeText(t).then(function(){alert('✅ 已複製，可直接貼給客人！');});
+}
+
+// ══════════════════════════════════════════════════════
+// CRM
+// ══════════════════════════════════════════════════════
+var clients=JSON.parse(localStorage.getItem('mp_clients')||'[]');
+var editIdx=-1;
+
+function renderClients(){
+  var el=document.getElementById('client-list');
+  if(!clients.length){
+    el.innerHTML='<div style="text-align:center;padding:40px;color:var(--mist);font-size:.88rem;">尚未新增任何客戶</div>';
+    return;
+  }
+  el.innerHTML='';
+  clients.forEach(function(c,i){
+    var lp='';
+    if(c.year&&c.month&&c.day) lp='靈數'+lifePath(+c.year,+c.month,+c.day);
+    var div=document.createElement('div');
+    div.className='client-card';
+    div.innerHTML='<div class="cc-info"><h3>'+c.name+'</h3><p>'+c.phone+(lp?' ｜ '+lp:'')+(c.note?' ｜ '+c.note:'')+'</p></div>'+
+      '<div class="cc-btns">'+
+      '<button class="cc-btn primary" onclick="loadClient('+i+')">解析</button>'+
+      '<button class="cc-btn" onclick="editClient('+i+')">編輯</button>'+
+      '<button class="cc-btn" onclick="delClient('+i+')">刪除</button>'+
+      '</div>';
+    el.appendChild(div);
+  });
+}
+
+function openAddClient(){
+  editIdx=-1;
+  document.getElementById('modal-title').textContent='新增客戶';
+  ['c-name','c-phone','c-year','c-month','c-day','c-note'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('client-modal').classList.add('on');
+}
+function editClient(i){
+  editIdx=i;
+  var c=clients[i];
+  document.getElementById('modal-title').textContent='編輯客戶';
+  document.getElementById('c-name').value=c.name||'';
+  document.getElementById('c-phone').value=c.phone||'';
+  document.getElementById('c-year').value=c.year||'';
+  document.getElementById('c-month').value=c.month||'';
+  document.getElementById('c-day').value=c.day||'';
+  document.getElementById('c-note').value=c.note||'';
+  document.getElementById('client-modal').classList.add('on');
+}
+function closeModal(){ document.getElementById('client-modal').classList.remove('on'); }
+function saveClient(){
+  var c={
+    name:document.getElementById('c-name').value.trim(),
+    phone:document.getElementById('c-phone').value.trim(),
+    year:document.getElementById('c-year').value.trim(),
+    month:document.getElementById('c-month').value.trim(),
+    day:document.getElementById('c-day').value.trim(),
+    note:document.getElementById('c-note').value.trim()
+  };
+  if(!c.name){alert('請輸入姓名');return;}
+  if(editIdx>=0) clients[editIdx]=c;
+  else clients.push(c);
+  localStorage.setItem('mp_clients',JSON.stringify(clients));
+  closeModal();
+  renderClients();
+}
+function delClient(i){
+  if(!confirm('確定刪除「'+clients[i].name+'」？')) return;
+  clients.splice(i,1);
+  localStorage.setItem('mp_clients',JSON.stringify(clients));
+  renderClients();
+}
+function loadClient(i){
+  var c=clients[i];
+  document.getElementById('f-name').value=c.name||'';
+  if(c.year) document.getElementById('f-year').value=c.year;
+  if(c.month) document.getElementById('f-month').value=c.month;
+  if(c.day) document.getElementById('f-day').value=c.day;
+  goNav('analyze',document.querySelector('.nav a'));
+  document.querySelector('.nav a').classList.add('on');
+  document.querySelectorAll('.nav a')[1].classList.remove('on');
+  window.scrollTo(0,0);
+}
 </script>
-
 </body>
 </html>
