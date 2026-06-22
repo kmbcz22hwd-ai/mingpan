@@ -594,22 +594,46 @@ function genPage(id){
 
   if(id==='p3'){
     var body='';
+    // 說明區
+    body+='<div style="background:var(--gold-pale);border:1px solid var(--gold-lt);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:.8rem;line-height:1.9;color:#5a4010;">';
+    body+='<strong>說明：</strong><br>';
+    body+='★★★☆☆ ＝ 此數字出現1次，能量普通，具備基本特質<br>';
+    body+='★★★★☆ ＝ 出現2次（強化數），能量加倍，優缺點都更明顯<br>';
+    body+='★★★★★ ＝ 出現3次以上，能量極強，這個特質主導你的人生<br>';
+    body+='<span style="color:var(--jade)">✦ 強化數</span>標籤代表這個數字出現超過1次，影響力更深，優點更突出、挑戰也更大<br>';
+    body+='缺數請參見「缺數分析」頁面';
+    body+='</div>';
+
+    var hasAny=false;
     for(var i=1;i<=9;i++){
       var cnt=g.counts[i];
+      if(cnt===0) continue; // 跳過缺數
+      hasAny=true;
       var n=NUM[i];
-      var stars=cnt===0?'○ 缺數':cnt===1?'★★★☆☆':cnt===2?'★★★★☆':'★★★★★';
-      body+='<div style="border:1px solid var(--border);border-radius:4px;padding:12px 14px;margin-bottom:10px;">';
-      body+='<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px;">';
-      body+='<span style="font-family:\'Noto Serif TC\',serif;font-size:1.6rem;font-weight:900;color:'+(cnt===0?'#e0c4bc':'var(--gold)')+';">'+i+'</span>';
-      body+='<span style="font-size:.85rem;font-weight:700;color:var(--jade);">'+n.label+'</span>';
-      body+='<span style="color:var(--gold);font-size:.85rem;">'+stars+'</span>';
-      if(cnt>=2) body+='<span class="chip j">×'+cnt+'</span>';
-      body+='</div>';
-      body+='<p><strong>優點：</strong>'+n.good+'</p>';
-      body+='<p><strong>挑戰：</strong>'+n.bad+'</p>';
-      body+='<p><strong>建議：</strong>'+n.fix+'</p>';
+      var stars=cnt===1?'★★★☆☆':cnt===2?'★★★★☆':'★★★★★';
+      var starColor=cnt>=3?'var(--rust)':cnt>=2?'var(--jade)':'var(--gold)';
+      body+='<div style="border:1px solid var(--border);border-radius:6px;padding:14px 16px;margin-bottom:12px;background:var(--card);">';
+      // Header
+      body+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">';
+      body+='<span style="font-family:\'Noto Serif TC\',serif;font-size:2rem;font-weight:900;color:var(--gold);line-height:1;min-width:32px;">'+i+'</span>';
+      body+='<div>';
+      body+='<div style="font-size:.88rem;font-weight:700;color:var(--jade);margin-bottom:2px;">'+n.label+'</div>';
+      body+='<div style="color:'+starColor+';font-size:1rem;letter-spacing:1px;">'+stars;
+      if(cnt>=2) body+=' <span style="font-size:.72rem;background:var(--jade-lt);color:var(--jade);border:1px solid #a0ccc4;border-radius:3px;padding:1px 7px;margin-left:6px;font-weight:700;">強化數 ×'+cnt+'</span>';
+      body+='</div></div></div>';
+      // 內容
+      if(cnt>=2){
+        // 強化數要特別說明加倍效果
+        body+='<div style="background:var(--jade-lt);border-radius:4px;padding:10px 12px;margin-bottom:10px;font-size:.8rem;color:#2a3d35;line-height:1.8;">';
+        body+='此數字在你的命盤出現 <strong>'+cnt+' 次</strong>，代表這個能量在你身上特別強烈。優點更突出，但挑戰與課題也更明顯，需要有意識地管理。';
+        body+='</div>';
+      }
+      body+='<p style="font-size:.85rem;line-height:1.8;margin-bottom:6px;"><strong>優點：</strong>'+n.good+'</p>';
+      body+='<p style="font-size:.85rem;line-height:1.8;margin-bottom:6px;"><strong>挑戰：</strong>'+n.bad+'</p>';
+      body+='<p style="font-size:.85rem;line-height:1.8;"><strong>建議：</strong>'+n.fix+'</p>';
       body+='</div>';
     }
+    if(!hasAny) body+='<p style="color:var(--mist)">命盤數字計算中…</p>';
     html+=sec('三','數字能量分析',body);
   }
 
@@ -674,23 +698,105 @@ function genPage(id){
 
   if(id==='p6'){
     var n=NUM[g.lp];
-    var connStr=g.conns.length?g.conns.map(function(c){return CONN[c].name;}).join('、'):'無完整連線';
-    var missStr=g.miss.length?g.miss.join('、'):'無缺數';
-    var body='<p>你的核心主數是 <strong style="color:var(--gold);font-size:1.1rem;">'+g.lp+'</strong>（'+n.label+'）</p>';
-    body+='<p style="margin-top:8px">'+n.good+'。'+n.bad+'</p>';
-    if(g.conns.includes('369')){
-      body+='<p style="margin-top:10px">你的命盤有 <strong>369 智慧線</strong>，洞察力強，看人準確，直覺敏銳。你可能常常\u300c一摸就知道哪裡有問題\u300d，甚至客人還沒開口，你就已經感覺到了。</p>';
+    var body='';
+
+    // 核心主數
+    body+='<div style="text-align:center;padding:16px;background:var(--gold-pale);border-radius:8px;margin-bottom:20px;">';
+    body+='<div style="font-size:.75rem;color:var(--mist);letter-spacing:.1em;margin-bottom:4px;">核心主數</div>';
+    body+='<div style="font-family:\'Noto Serif TC\',serif;font-size:3rem;font-weight:900;color:var(--gold);line-height:1;">'+g.lp+'</div>';
+    body+='<div style="font-size:.9rem;font-weight:700;color:var(--jade);margin-top:4px;">'+n.label+'</div>';
+    body+='</div>';
+
+    // 基本性格
+    body+='<div style="border-left:3px solid var(--gold);padding-left:14px;margin-bottom:18px;">';
+    body+='<p style="font-weight:700;margin-bottom:6px;">你天生的樣子</p>';
+    body+='<p style="font-size:.88rem;line-height:1.9;">'+n.good+'。這讓你在人群中往往是那個推動事情發生的人，或是讓氣氛活絡的那個。</p>';
+    body+='<p style="font-size:.88rem;line-height:1.9;margin-top:6px;">但也因為這樣，'+n.bad+'。這不是缺點，而是你這個能量的另一面。</p>';
+    body+='</div>';
+
+    // 缺數對性格的影響
+    if(g.miss.length>0){
+      body+='<div style="border-left:3px solid var(--rust);padding-left:14px;margin-bottom:18px;">';
+      body+='<p style="font-weight:700;color:var(--rust);margin-bottom:8px;">缺數讓你的性格有這些面向</p>';
+      var missPersonality={
+        1:'你有時候會覺得很難真正相信自己的判斷，需要別人的肯定才能安心。這不代表你不行，而是自信心的建立是你的人生功課。',
+        2:'你外表看起來很能照顧別人，但自己脆弱的時候很難開口說。感情或親密關係中容易付出很多，卻覺得沒被真正接住。',
+        3:'你可能有很多想法，但表達出來的比實際想的少很多。有時候別人不懂你，不是因為你不好，而是你還沒找到最適合自己的表達方式。',
+        4:'計畫能力強，但執行起來容易拖。生活節奏不規律，知道要改但很難真的做到。',
+        5:'情緒容易被外在環境帶著走。感情一波動，工作也跟著亂。你是情感能量型人格——當心穩，整個人的狀態就穩。',
+        6:'對家庭或感情有時候反而顯得疏離，或不知道怎麼表達關心。不是不在乎，是不太知道怎麼做。',
+        7:'行動力強，但有時太快行動，缺少沉澱和反思。遇到瓶頸的時候，靜下來往往比繼續推更有效。',
+        8:'對於錢的感覺很複雜。可能很努力卻存不住，或覺得談錢很俗。這其實是財富意識需要後天建立的信號。',
+        9:'格局大有時候看得見，有時候又很糾結在小事上。你的大愛潛力很高，但需要刻意練習從小處去擴展視野。'
+      };
+      g.miss.forEach(function(m){
+        if(missPersonality[m]){
+          body+='<div style="margin-bottom:10px;">';
+          body+='<span style="font-size:.78rem;font-weight:700;color:var(--rust);">缺'+m+'（'+NUM[m].label+'）的影響：</span>';
+          body+='<p style="font-size:.85rem;line-height:1.85;margin-top:3px;">'+missPersonality[m]+'</p>';
+          body+='</div>';
+        }
+      });
+      body+='</div>';
     }
-    if(g.conns.includes('789')){
-      body+='<p style="margin-top:10px">你的命盤有 <strong>789 貴人線</strong>，人生低潮時總有人拉你一把。貴人往往不是親人，而是客戶、女性、年長者或靈性圈的人。後半人生靠口碑與人脈發展。</p>';
+
+    // 強化數對性格的影響
+    var multiNums=Object.keys(g.counts).filter(function(k){return g.counts[k]>=2;});
+    if(multiNums.length>0){
+      body+='<div style="border-left:3px solid var(--jade);padding-left:14px;margin-bottom:18px;">';
+      body+='<p style="font-weight:700;color:var(--jade);margin-bottom:8px;">強化數讓你的性格更突出</p>';
+      var multiPersonality={
+        1:'你對「主導」有強烈的需求，這讓你執行力超強，但在關係中要注意不要讓對方覺得沒有空間。',
+        2:'你的情感敏感度極高，幾乎是一種天賦。但也因此容易過度共情，把別人的問題都扛在自己身上。',
+        3:'你的表達力和創意能量非常旺盛，說話有感染力，學東西快。但注意力容易分散，需要一個主軸。',
+        4:'你的責任感和執行力比別人強很多。但也可能太習慣扛，忘了說出自己的需求。',
+        5:'你的適應力和感知力很強，變化對你來說不是壓力而是刺激。但內心其實渴望一個穩定的錨點。',
+        6:'你的照顧欲和愛人能力非常強，身邊的人都感受得到。只是記得，你也需要被照顧。',
+        7:'你的洞察力和思考深度超出常人，能看見別人看不見的層次。但有時候想太多反而讓自己卡住。',
+        8:'你的成就慾和管理能力都很強，適合帶領別人。但要小心不要讓自己變得太結果導向而失去彈性。',
+        9:'你的理想主義和慈悲心非常強烈，容易讓別人感到被理解和被接納。這是你最大的天賦，好好珍惜。'
+      };
+      multiNums.forEach(function(k){
+        var cnt=g.counts[k];
+        if(multiPersonality[k]){
+          body+='<div style="margin-bottom:10px;">';
+          body+='<span style="font-size:.78rem;font-weight:700;color:var(--jade);">'+k+' 出現'+cnt+'次的影響：</span>';
+          body+='<p style="font-size:.85rem;line-height:1.85;margin-top:3px;">'+multiPersonality[k]+'</p>';
+          body+='</div>';
+        }
+      });
+      body+='</div>';
     }
-    if(g.miss.includes(2)){
-      body+='<p style="margin-top:10px"><strong>缺2</strong>：外表能照顧別人，但不太會表達自己的脆弱。容易悶著、忍著、假裝沒事。感情裡容易\u300c我付出很多，但沒被真正接住\u300d。</p>';
+
+    // 連線對性格的加成
+    if(g.conns.length>0){
+      body+='<div style="border-left:3px solid var(--gold);padding-left:14px;margin-bottom:18px;">';
+      body+='<p style="font-weight:700;margin-bottom:8px;">命盤連線讓你多了這些特質</p>';
+      g.conns.forEach(function(l){
+        var c=CONN[l];
+        if(!c) return;
+        body+='<div style="margin-bottom:10px;">';
+        body+='<span style="font-size:.78rem;font-weight:700;color:var(--gold);">'+c.name+'（'+l+'）</span>';
+        body+='<p style="font-size:.85rem;line-height:1.85;margin-top:3px;">'+c.who+'</p>';
+        body+='</div>';
+      });
+      body+='</div>';
     }
-    if(g.miss.includes(5)){
-      body+='<p style="margin-top:10px"><strong>缺5</strong>：中心平衡感是課題。情緒容易被感情影響，遇到感情波動工作也會跟著亂。因為你不是純事業型人格，而是\u300c情感能量型人格\u300d。當心穩，運就穩。</p>';
+
+    // 整合總結
+    body+='<div style="background:var(--jade-lt);border-radius:6px;padding:16px;margin-top:4px;">';
+    body+='<p style="font-size:.82rem;font-weight:700;color:var(--jade);margin-bottom:8px;">整合起來，你是這樣的人</p>';
+    var summary='你是一個核心主數'+g.lp+'（'+n.label+'）的人，'+n.good.split('、').slice(0,2).join('與')+'是你天生帶來的能量。';
+    if(g.miss.length){
+      summary+='但因為命盤中缺'+g.miss.join('、')+'的能量，你在'+g.miss.map(function(m){return NUM[m].label.split('‧')[0];}).join('、')+'這些面向上需要後天刻意學習，這也是你這輩子最容易在這些地方碰到課題的原因。';
     }
-    body+='<p style="margin-top:12px">命盤連線：<strong>'+connStr+'</strong>　缺數：<strong>'+(g.miss.length?'缺'+missStr:'無缺數')+'</strong></p>';
+    if(g.conns.length){
+      summary+='加上命盤有'+g.conns.map(function(l){return CONN[l]?CONN[l].name:'';}).join('與')+'，讓你同時具備'+g.conns.map(function(l){return CONN[l]?CONN[l].who.substring(0,20)+'…':'';}).slice(0,1).join('')+'這樣的特質。';
+    }
+    summary+='整體來說，你是一個潛力深厚、有獨特能量的人，只要找到對的方向，會走得很遠。';
+    body+='<p style="font-size:.85rem;line-height:1.95;">'+summary+'</p>';
+    body+='</div>';
+
     html+=sec('六','性格深度分析',body);
   }
 
@@ -966,36 +1072,122 @@ function genPage(id){
   }
 
   if(id==='p16'){
-    var places=['翠林','湖畔','花園','山丘','海邊','古宮','草原','雲端'];
-    var elems=['水晶','桂花','竹林','山泉','玫瑰','松木','薰衣草','梅花'];
-    var idx=((g.lp-1)+g.miss.length)%8;
-    var place=places[idx];
-    var elem=elems[(idx+2)%8];
-    var body='<p style="font-size:.82rem;color:var(--mist);margin-bottom:12px;">※ 元辰宮為創意性命理詮釋，屬娛樂性內容，不具備客觀預測能力。</p>';
-    body+='<p>你的元辰宮場景是——</p>';
-    body+='<p style="font-family:\'Noto Serif TC\',serif;font-size:1.1rem;font-weight:700;color:var(--jade);margin:8px 0;">'+place+'中的'+elem+'宮殿</p>';
-    body+='<p>這裡的氛圍：安靜、深邃、帶著一股說不清楚的美感。像你這個人——表面平靜，但內在有很多正在流動的東西。</p>';
-    body+='<p style="margin-top:10px"><strong>財庫：</strong>'+([4,8,1].includes(g.lp)?'財庫寬敞，但需要主動管理，才能讓財富留住。':'財庫在後院，需要靠口碑與信任慢慢累積。')+'</p>';
-    body+='<p><strong>桃花：</strong>'+([2,6,9].includes(g.lp)?'桃花旺，但容易遇到靈魂契合卻現實條件複雜的緣分。':'桃花較慢開，但一旦開了往往是認真的緣分。')+'</p>';
-    body+='<p><strong>健康能量：</strong>'+([7,4].includes(g.lp)?'需要定期淨化，避免壓力累積在身體。':'整體能量穩定，維持規律的調理即可。')+'</p>';
-    body+='<p><strong>元辰宮建議：</strong>多接觸大自然，定期靜心，讓自己有充電的時間與空間。</p>';
+    // 元辰宮場景：根據生命靈數決定主景
+    var sceneMap={
+      1:{place:'山頂上的石造宮殿',atmo:'開闊、有風、視野極好。站在這裡，你能看見所有人看不到的遠方。',color:'深藍與石灰色'},
+      2:{place:'湖畔的竹林小屋',atmo:'靜謐、有水聲、空氣裡帶著一點濕潤。這裡讓人放鬆，但也讓人想留下來不走。',color:'淺綠與湖藍'},
+      3:{place:'花園中的玻璃溫室',atmo:'明亮、充滿色彩、到處是盛開的花。走進來，你會忍不住微笑。',color:'橙金與嫩綠'},
+      4:{place:'森林深處的木造莊園',atmo:'穩重、踏實、四周都是百年老樹。這裡的空氣讓人覺得安心，一切都會好。',color:'深棕與墨綠'},
+      5:{place:'海邊的白色燈塔',atmo:'有風、有浪聲、光線充足。在這裡，你能感受到自由，也能看見方向。',color:'白色與海藍'},
+      6:{place:'山谷裡的玫瑰莊園',atmo:'溫暖、香氣瀰漫、充滿愛的能量。走進來，你會感受到被照顧的感覺。',color:'玫瑰粉與金黃'},
+      7:{place:'雲端上的水晶宮殿',atmo:'靜謐、純淨、有一種超脫塵世的氛圍。這裡的每一顆水晶，都映照著你最深的內心。',color:'透明與紫色'},
+      8:{place:'城市中心的黃金塔樓',atmo:'氣勢磅礴、能量強烈、每一個角落都充滿成就的氣息。',color:'黑金與深紅'},
+      9:{place:'星空下的古老神殿',atmo:'深邃、神秘、帶著智慧與慈悲的能量。這裡像是整個宇宙的縮影，靜靜守護著你。',color:'深藍與銀白'}
+    };
+    var sc=sceneMap[g.lp];
+
+    // 財庫根據命盤
+    var caiku;
+    if(g.conns.includes('168')) caiku='財庫寬敞明亮，財富能量強，主動出擊時財源自然流入，適合以服務換財富的模式。';
+    else if([4,8].includes(g.lp)) caiku='財庫在正殿，需要用規劃和紀律來守護，穩健積累是你的財富之道。';
+    else if(g.miss.includes(8)) caiku='財庫在後院，需要有意識地建立財富意識，把賺錢當成一門學問來學。';
+    else caiku='財庫位置穩固，靠口碑與信任慢慢累積，後運財富往往比前半生豐盛。';
+
+    // 桃花根據命盤
+    var taohua;
+    if(g.status==='已婚') taohua='感情宮位穩固，婚姻能量持續，維護好眼前的緣分比追求新的更重要。';
+    else if([2,6,9].includes(g.lp)) taohua='桃花能量強，容易吸引人，但也容易遇到靈魂相近卻現實條件複雜的緣分，需要謹慎辨別。';
+    else if(g.miss.includes(2)||g.miss.includes(6)) taohua='桃花來得慢，但一旦認真了就很深。不要急，你的緣分是需要沉澱的那種。';
+    else taohua='桃花不算旺，但緣分出現時往往是真心的。與其廣撒網，不如在深度上用心。';
+
+    // 健康根據命盤
+    var health;
+    if(g.miss.includes(5)) health='元辰宮中心位有缺，情緒能量是你健康的關鍵。心情好，身體就好；心情亂，身體最先反應。';
+    else if([7,4].includes(g.lp)) health='神經與骨骼是需要重點養護的部位，定期放鬆深層壓力，避免壓力長期積累在身體裡。';
+    else if(g.conns.includes('258')) health='你容易吸收他人的情緒能量，需要定期清理，靜心和大自然是最好的排毒方式。';
+    else health='整體健康能量尚可，維持規律的調理和作息，身體自然會給你正面的回應。';
+
+    // 元辰宮建議根據命盤
+    var yuanAdv;
+    if([9,7,6].includes(g.lp)) yuanAdv='你的元辰宮需要定期靜心和靈性滋養。冥想、接觸大自然、或系統性的靈性學習，都是讓你的宮殿能量充盈的方式。';
+    else if([1,8,4].includes(g.lp)) yuanAdv='你的元辰宮需要平衡休息與行動。定期讓自己放空，不要讓持續的推進消耗掉宮殿的基礎能量。';
+    else yuanAdv='你的元辰宮需要情感的滋養。與真正關心你的人保持深度連結，是讓宮殿能量穩定最重要的事。';
+
+    var body='<p style="font-size:.78rem;color:var(--mist);margin-bottom:14px;">※ 元辰宮為創意性命理詮釋，屬娛樂性內容，不具備客觀預測能力。</p>';
+    body+='<p style="margin-bottom:6px;">你的元辰宮場景是——</p>';
+    body+='<p style="font-family:\'Noto Serif TC\',serif;font-size:1.1rem;font-weight:700;color:var(--jade);margin-bottom:12px;">'+sc.place+'</p>';
+    body+='<div style="background:var(--gold-pale);border-radius:6px;padding:14px;margin-bottom:16px;">';
+    body+='<p style="font-size:.85rem;line-height:1.9;">氛圍：'+sc.atmo+'</p>';
+    body+='<p style="font-size:.78rem;color:var(--mist);margin-top:4px;">主色調：'+sc.color+'</p>';
+    body+='</div>';
+    body+='<p><strong>財庫：</strong>'+caiku+'</p>';
+    body+='<p style="margin-top:8px"><strong>桃花：</strong>'+taohua+'</p>';
+    body+='<p style="margin-top:8px"><strong>健康能量：</strong>'+health+'</p>';
+    body+='<p style="margin-top:8px"><strong>元辰宮建議：</strong>'+yuanAdv+'</p>';
     html+=sec('十六','元辰宮（創意詮釋）',body);
   }
 
   if(id==='p17'){
-    var body='<p>現在最值得努力的，</p>';
-    body+='<p>不只是一直賺錢，</p>';
-    body+='<p style="margin-top:8px">而是——</p>';
-    body+='<p style="font-family:\'Noto Serif TC\',serif;font-size:1rem;font-weight:700;color:var(--jade);margin-top:8px;">打造屬於你的品牌與口碑系統。</p>';
-    body+='<p style="margin-top:10px">你的運是\u300c口碑累積型\u300d。</p>';
-    body+='<p>每一個真正被你服務到的人，都是你最強的行銷。</p>';
-    body+='<p style="margin-top:10px"><strong>接下來的行動建議：</strong></p>';
-    body+='<p>① 整理一份清晰的服務介紹，讓客人能輕鬆分享給朋友</p>';
-    body+='<p>② 建立固定的社群更新頻率，讓人感覺到你的存在</p>';
-    body+='<p>③ 每個月主動聯繫3位舊客人，感情經營不輸新開發</p>';
-    body+='<p>④ '+YEAR[g.yf].t+'的'+g.ty+'年，'+YEAR[g.yf].d+'</p>';
-    body+='<p style="margin-top:10px">記住：你不是靠爆發賺錢的人，你是靠信任賺錢的人。</p>';
-    body+='<p>信任，需要時間，但一旦建立，就很難被取代。</p>';
+    var yr=YEAR[g.yf];
+    // 根據生命靈數給個人化建議
+    var coreAdvice={
+      1:'你最大的功課是學會放慢、等待、傾聽。當你把領導力和柔軟心結合起來，沒有人擋得住你。',
+      2:'你最大的功課是先愛自己。你給別人的那麼多，有多少留給了自己？把自己放在第一位，反而能給別人更多。',
+      3:'你最大的功課是聚焦。你的才華太多，方向太廣，找到一個主軸深耕，你的影響力會大到你自己都驚訝。',
+      4:'你最大的功課是接受彈性。不是所有事情都需要按計畫走，有時候偏離計畫反而帶你去更好的地方。',
+      5:'你最大的功課是找到內在的錨點。自由是你的天性，但心有所依，才能真正飛遠。',
+      6:'你最大的功課是接受幫助。你習慣照顧別人，但讓別人照顧你，是你這輩子需要學習的功課。',
+      7:'你最大的功課是相信直覺，然後行動。想得夠多了，是時候讓你的洞察力走出頭腦、落地成真。',
+      8:'你最大的功課是讓成功有溫度。財富和成就是手段，不是目的。找到讓你真正感到有意義的事，才是最大的成就。',
+      9:'你最大的功課是允許自己不完美。你對世界的期待很高，對自己的要求也很高，但學會接受不完美，你才能真正放鬆地發光。'
+    };
+    // 根據連線給具體事業建議
+    var careerAdvice='';
+    if(g.conns.includes('369')) careerAdvice='你的智慧線代表知識變現是你的強項，把你懂得的東西系統化、教出去，是最適合你的事業方向。';
+    else if(g.conns.includes('789')) careerAdvice='你的貴人線代表人脈是你最大的資產，越願意走出去、分享自己，貴人就越快出現。';
+    else if(g.conns.includes('168')) careerAdvice='你的財富線代表以服務換財富是你的路，把每一次服務做到讓客人感動，財富自然跟來。';
+    else if(g.conns.includes('147')) careerAdvice='你的行動力線代表你是行動派，不要等計畫完美才開始，先動起來，再邊走邊調整。';
+    else careerAdvice='你的命盤是穩健型，深耕一個領域、建立長期口碑，是最適合你的方式。不要羨慕別人的快速爆發，你的積累終將開花。';
+
+    // 根據缺數給補足建議
+    var missAdviceStr='';
+    if(g.miss.length>0){
+      var topMiss=g.miss.slice(0,2);
+      missAdviceStr='命盤中缺'+topMiss.join('與')+'的能量，這兩個面向是你需要刻意練習的地方。'+
+        topMiss.map(function(m){return NUM[m].fix;}).join('；')+'。把功課變成功力，缺的地方往往會成為你最大的突破。';
+    }
+
+    var body='';
+    body+='<div style="background:var(--gold-pale);border-radius:8px;padding:16px;margin-bottom:16px;">';
+    body+='<p style="font-family:\'Noto Serif TC\',serif;font-size:1rem;font-weight:700;color:var(--jade);margin-bottom:8px;">給'+g.name+'的話</p>';
+    body+='<p style="font-size:.88rem;line-height:1.95;">'+coreAdvice[g.lp]+'</p>';
+    body+='</div>';
+
+    body+='<div style="border-left:3px solid var(--jade);padding-left:14px;margin-bottom:16px;">';
+    body+='<p style="font-weight:700;margin-bottom:6px;">'+g.ty+'年（流年'+g.yf+'：'+yr.t+'）最重要的事</p>';
+    body+='<p style="font-size:.86rem;line-height:1.9;">'+yr.d+'</p>';
+    body+='<p style="font-size:.86rem;line-height:1.9;margin-top:8px;">'+careerAdvice+'</p>';
+    body+='</div>';
+
+    if(missAdviceStr){
+      body+='<div style="border-left:3px solid var(--rust);padding-left:14px;margin-bottom:16px;">';
+      body+='<p style="font-weight:700;color:var(--rust);margin-bottom:6px;">今年的功課</p>';
+      body+='<p style="font-size:.86rem;line-height:1.9;">'+missAdviceStr+'</p>';
+      body+='</div>';
+    }
+
+    body+='<div style="background:var(--ink);border-radius:6px;padding:16px;">';
+    body+='<p style="color:var(--gold);font-family:\'Noto Serif TC\',serif;font-weight:700;margin-bottom:10px;">接下來的三個行動</p>';
+    var actions=[
+      [1,8,4].includes(g.lp)?'在你擅長的領域，主動讓更多人看見你，不要等準備好才出發':'把現在做的事做深做透，專精比廣度更能帶來突破',
+      g.conns.length?'發揮'+CONN[g.conns[0]].name+'的優勢，找到最適合你的舞台':'找到一件你願意每天做、做十年也不厭倦的事，從那裡出發',
+      g.miss.length?'刻意練習缺'+g.miss[0]+'的能量（'+NUM[g.miss[0]].fix+'），把人生功課變成競爭優勢':'把你的完整能量整合起來，你比自己想的更有潛力'
+    ];
+    actions.forEach(function(a,i){
+      body+='<p style="color:rgba(255,255,255,.85);font-size:.85rem;line-height:1.85;margin-bottom:6px;">'+['①','②','③'][i]+' '+a+'</p>';
+    });
+    body+='</div>';
+
     html+=sec('十七','AI 人生建議',body);
   }
 
