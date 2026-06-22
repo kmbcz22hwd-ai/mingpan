@@ -313,15 +313,18 @@ function zodiac(y){
   return z[(y-4)%12]+'年';
 }
 function constellation(m,d){
-  var c=[
-    [1,20,'摩羯'],[2,19,'水瓶'],[3,20,'雙魚'],[4,20,'牡羊'],[5,21,'金牛'],[6,21,'雙子'],
-    [7,23,'巨蟹'],[8,23,'獅子'],[9,23,'處女'],[10,23,'天秤'],[11,22,'天蠍'],[12,22,'射手'],[1,19,'摩羯']
-  ];
-  for(var i=0;i<c.length-1;i++){
-    var nm=c[i][0],nd=c[i][1],nn=c[i][2];
-    var xm=c[i+1][0],xd=c[i+1][1];
-    if((m===nm&&d>=nd)||(m===xm&&d<xd)) return nn+'座';
-  }
+  // 正確星座日期對照
+  if((m===1&&d>=20)||(m===2&&d<=18)) return '水瓶座';
+  if((m===2&&d>=19)||(m===3&&d<=20)) return '雙魚座';
+  if((m===3&&d>=21)||(m===4&&d<=19)) return '牡羊座';
+  if((m===4&&d>=20)||(m===5&&d<=20)) return '金牛座';
+  if((m===5&&d>=21)||(m===6&&d<=21)) return '雙子座';
+  if((m===6&&d>=22)||(m===7&&d<=22)) return '巨蟹座';
+  if((m===7&&d>=23)||(m===8&&d<=22)) return '獅子座';
+  if((m===8&&d>=23)||(m===9&&d<=22)) return '處女座';
+  if((m===9&&d>=23)||(m===10&&d<=23)) return '天秤座';
+  if((m===10&&d>=24)||(m===11&&d<=22)) return '天蠍座';
+  if((m===11&&d>=23)||(m===12&&d<=21)) return '射手座';
   return '摩羯座';
 }
 
@@ -386,16 +389,44 @@ var NUM={
 };
 
 var CONN={
-  "147":{name:'行動力線（權力線）',desc:'目標感強、執行力旺盛、天生有領導與開創能量。說到做到，適合創業或在需要快速推進的領域發揮。此連線同時帶有強烈的自我意志，要注意與他人的溝通方式。'},
-  "258":{name:'情感線',desc:'情感豐沛、同理心極強，對人際關係與情緒極為敏銳。天生的傾聽者與安慰者，適合服務、諮詢、療癒相關工作。但要注意不要吸收他人負能量過多。'},
-  "369":{name:'智慧線',desc:'學習力強、直覺準確、洞察人事物本質的能力極佳。很多做技術、命理、身體調理、能量療癒的人都有這條。你可能常常\u300c一摸就知道哪裡有問題\u300d。'},
-  "456":{name:'組織管理線',desc:'規劃能力與執行力兼具，適合管理職或獨立經營。能有效帶領團隊或管理資源，是天生的經營者。'},
-  "789":{name:'貴人線',desc:'人際緣分極佳，人生低潮時總有人拉一把。貴人往往不是親人，反而是客戶、女性、年長者或靈性圈的人。後運往往靠人脈與口碑發展。'},
-  "123":{name:'創造線（地軸線）',desc:'從行動到協調到表達，具備完整的創造能量。腳踏實地，適合建立長期穩健的事業，基礎紮實後爆發力強。'},
-  "159":{name:'成就線',desc:'從開創（1）到平衡（5）到智慧（9），是達成重大成就的完整路徑。人生往往在跌跌撞撞後，走出屬於自己的成功之路。'},
-  "168":{name:'財富線',desc:'行動力（1）帶動愛的能量（6）創造財富成就（8），財運能量較旺。主動出擊時財源更容易到來，適合以服務與愛心為核心的商業模式。'},
-  "357":{name:'精神探索線',desc:'創意（3）、平衡（5）、靈性（7）形成精神探索的連結，對生命本質有深度追求，具備哲學思維與靈性感知，適合在精神或療癒領域發展。'}
+  "147":{name:'行動力線（權力線）',
+    who:'你是那種說到做到的人。目標感強，不喜歡拖延，有時候別人還在討論，你已經開始動了。天生適合創業或帶領別人，但也容易因為太有主見讓身邊的人覺得有壓力。',
+    event:'事業上容易走得比同齡人快，年輕就有機會主導重要決策。感情上可能因為太強勢讓對方喘不過氣。財務上有能力賺錢，但也花得快。',
+    advice:'學會等待，不是每件事都要你來推。讓身邊的人也有機會發揮，你的領導力會更加完整。'},
+  "258":{name:'情感線',
+    who:'你是極度敏感的人，對他人情緒有近乎直覺的感知。走進一個空間，馬上能感受到氣氛。非常適合服務、療癒、陪伴類工作，但特別容易被他人負能量影響。',
+    event:'感情上投入非常深，容易受傷。家庭關係對你影響極深，原生家庭的模式很可能複製到親密關係裡。財務上容易因情感做出不理性決定。',
+    advice:'為自己建立情感防護罩。服務他人是天賦，但不能讓自己的能量完全耗盡。每天給自己獨處充電時間。'},
+  "369":{name:'智慧線',
+    who:'你有非常強的洞察力，能看穿事情的本質。說話往往一針見血，看人很準。學什麼都快，但也因為學得快容易淺嚐即止。',
+    event:'很多做技術、命理、身體調理、能量療癒的人都有這條線。你可能常常一摸就知道哪裡有問題，甚至客人還沒開口你就感覺到了。',
+    advice:'你的直覺是天賦，要學會說對的時機。定期輸出你的知識（寫作、教學、分享），讓智慧線能量持續流動。'},
+  "456":{name:'組織管理線',
+    who:'你有天生的規劃與執行能力，做事有條理，重視流程與效率。別人眼中混亂的事情，你能看出結構然後整理好。適合管理職、獨立創業。',
+    event:'事業上容易早早承擔重要責任。家庭中往往是扛起責任的那個人，長子長女效應明顯。財務上擅長規劃，但有時過於保守錯失機會。',
+    advice:'最需要學習的是授權。不是所有事都要自己做才放心，培養身邊的人，才能讓影響力真正放大。'},
+  "789":{name:'貴人線',
+    who:'你這輩子不缺貴人。人生低潮的時候，總會有人在關鍵時刻拉你一把。貴人往往是客戶、女性、年長者或靈性圈的人，帶有讓人想幫助你的氣質。',
+    event:'前半生可能靠自己硬撐，大約三十五歲之後開始發現人脈的力量，越來越多貴人出現。晚年靠口碑與人際關係活得最滋潤。',
+    advice:'學會接受幫助。越願意開口求助，貴人越快出現。同時你自己也是別人的貴人，多付出能量加倍回來。'},
+  "123":{name:'創造線（地軸線）',
+    who:'你具備從無到有的創造能量。從想法到協調到表達，能把腦中的畫面轉化成真實的東西。適合創作、教學、或任何把抽象概念具體化的工作。',
+    event:'年輕時嘗試很多不同的事，看起來有點散，但其實都在累積。大約三十歲後找到核心方向，之後的發展讓人刮目相看。',
+    advice:'給自己一個主線。你的創造力是寶，但需要明確方向。找到最想深耕的一件事，其他作為副線，不要同時主打太多。'},
+  "159":{name:'成就線',
+    who:'這是代表終將成就大事的連線。從開創到變化到智慧，你的人生注定要經歷轉折，然後在轉折後找到更高的位置。劇本通常是：年輕辛苦、中年轉型、晚年圓滿。',
+    event:'大約三十五到四十五歲之間會有一次重大的人生轉折，可能是職業、感情或人生方向的重新定位。這個轉折看起來很痛，但其實是走向更大成就的必經之路。',
+    advice:'不要逃避人生的轉折點。當一扇門關上，不要在原地停留太久，你的下一個舞台已經在等你了。'},
+  "168":{name:'財富線',
+    who:'你天生具備吸引財富的能量。行動力帶動服務與愛創造財富成就，你的賺錢方式往往是靠真心服務他人帶來的回報。越真心付出，財富越容易到來。',
+    event:'財運往往在三十歲後越來越好，前提是找到讓自己發自內心想做的事。感情上可能遇到因財務問題產生的摩擦，需要雙方對金錢觀念保持透明溝通。',
+    advice:'建立屬於自己的財富哲學。你適合以服務為核心的商業模式，思考如何幫助更多人，財富自然跟來。'},
+  "357":{name:'精神探索線',
+    who:'你天生是個靈性探索者。創意、自由、深思形成一個永遠在追問生命意義的靈魂。從小就對世界的運作方式感到好奇，對表面的解釋不滿足。',
+    event:'人生某個階段會深度投入靈性、哲學或某種信仰的探索。這不是迷信，而是靈魂需要滋養。這條線的人在療癒、藝術或精神指導方面有極深的天賦。',
+    advice:'不要壓抑對靈性的好奇心，那是天賦不是弱點。找一個系統性的靈性學習管道，讓這份探索能量有穩定的出口。'}
 };
+
 
 var MISS={
   1:'缺1：你的一生課題是\u300c學習自信與獨立決斷\u300d。過去可能習慣依賴他人意見，或難以主動出擊。當你有意識地練習自主決策，缺1反而會成為你最大的突破點。',
@@ -600,7 +631,6 @@ function genPage(id){
     var body='';
     if(g.conns.length===0){
       body='<p style="color:var(--mist)">命盤目前尚未形成完整連線，各數字能量獨立運作。適合專注於單一核心領域深耕，讓個別數字的特質充分發揮。</p>';
-      // Show which almost-connections exist
       var almost=["147","258","369","456","789","123","159","168","357"].filter(function(l){
         var has=l.split('').filter(function(n){return g.counts[n]>0;}).length;
         return has===2;
@@ -611,15 +641,35 @@ function genPage(id){
     } else {
       g.conns.forEach(function(l){
         var c=CONN[l];
-        body+='<div class="conn"><div class="conn-t">'+l.split('').join(' — ')+'　'+c.name+'</div><div class="conn-d">'+c.desc+'</div></div>';
+        if(!c) return;
+        body+='<div class="conn" style="margin-bottom:16px;">';
+        body+='<div class="conn-t">'+l.split('').join(' ─ ')+'　｜　'+c.name+'</div>';
+        body+='<div style="margin-top:10px;">';
+        body+='<div style="font-size:.78rem;font-weight:700;color:var(--jade);margin-bottom:4px;">▌ 這是什麼樣的人</div>';
+        body+='<div class="conn-d">'+c.who+'</div>';
+        body+='<div style="font-size:.78rem;font-weight:700;color:var(--jade);margin-top:10px;margin-bottom:4px;">▌ 人生容易遇到的事</div>';
+        body+='<div class="conn-d">'+c.event+'</div>';
+        body+='<div style="font-size:.78rem;font-weight:700;color:var(--rust);margin-top:10px;margin-bottom:4px;">▌ 建議與功課</div>';
+        body+='<div class="conn-d">'+c.advice+'</div>';
+        body+='</div></div>';
       });
     }
-    // All connections reference
-    body+='<div style="margin-top:14px;padding:12px;background:var(--gold-pale);border-radius:4px;font-size:.78rem;color:#5a4010;line-height:1.8;">';
-    body+='<strong>連線能量總覽：</strong><br>';
-    Object.keys(CONN).forEach(function(k){body+='<span style="margin-right:12px;">'+k+' '+CONN[k].name+'</span>';});
+    // 綜合連線建議
+    if(g.conns.length>1){
+      body+='<div style="background:var(--jade-lt);border:1px solid #a0ccc4;border-radius:6px;padding:14px 16px;margin-top:8px;">';
+      body+='<div style="font-size:.82rem;font-weight:700;color:var(--jade);margin-bottom:8px;">綜合連線建議</div>';
+      body+='<div style="font-size:.83rem;line-height:1.9;color:#2a3d35;">你的命盤同時具備 '+g.conns.map(function(l){return CONN[l]?CONN[l].name:l;}).join('、')+'。這些能量加在一起，代表你是一個既有行動力又有深度的人，既能創造又懂得照顧他人。建議你找到一個能同時發揮這幾條線能量的核心事業方向，而不是把自己分散在太多地方。</div>';
+      body+='</div>';
+    }
+    // 連線總覽參考
+    body+='<div style="margin-top:16px;padding:12px;background:var(--gold-pale);border-radius:4px;font-size:.76rem;color:#5a4010;line-height:2;">';
+    body+='<strong>所有連線能量一覽：</strong><br>';
+    Object.keys(CONN).forEach(function(k){
+      var active=g.conns.includes(k);
+      body+='<span style="margin-right:12px;'+(active?'font-weight:700;color:var(--jade)':'')+'">'+k+' '+CONN[k].name+(active?' ✓':'')+'</span>';
+    });
     body+='</div>';
-    html+=sec('五','連線能量分析',body);
+    html+=sec('五','連線能量完整分析',body);
   }
 
   if(id==='p6'){
@@ -721,21 +771,95 @@ function genPage(id){
   }
 
   if(id==='p11'){
-    var body='<p>你的最大課題，不是能力。</p>';
-    body+='<p style="margin-top:8px">你其實有能力。</p>';
-    body+='<p style="margin-top:8px">而是：\u300c'+([9,6,2].includes(g.lp)?'太容易把自己的價值，建立在被需要上。':[1,8,4].includes(g.lp)?'太在意成就與結果，忘了享受過程。':'太容易把自己的情緒壓下去，假裝沒事。')+'\u300d</p>';
-    if(g.miss.includes(5)){
-      body+='<p style="margin-top:8px">缺5的你，中心平衡感是核心課題。當感情波動，工作也容易跟著亂。你是\u300c情感能量型人格\u300d——當心穩，運就穩。</p>';
+    var earlyAge=g.lp<=3?'約0～28歲':g.lp<=6?'約0～25歲':'約0～30歲';
+    var midAge=g.lp<=3?'約29～45歲':g.lp<=6?'約26～42歲':'約31～48歲';
+    var lateAge=g.lp<=3?'約46歲以後':g.lp<=6?'約43歲以後':'約49歲以後';
+
+    var earlyDesc={
+      1:'早年是建立自信與方向的階段。你可能從小就比同齡人獨立，但也因此在人際關係上容易格格不入。這段時間最重要的是找到你的核心熱情，不要因為別人的眼光而迷失方向。',
+      2:'早年容易在情感與歸屬感上感到不安全。可能有過一段需要特別在乎別人感受、卻委屈自己的時期。這段時間的功課是建立內在安全感，而不是從外部關係中找答案。',
+      3:'早年是充滿想像力與嘗試的階段，什麼都想學、什麼都想試。但也容易因為太分散而感到迷茫。這段時間的功課是找到自己真正的表達方式。',
+      4:'早年可能承擔了比同齡人更多的責任，或家庭環境給了你很多壓力。你比別人更早懂事，但也因此失去了一些輕鬆探索的機會。',
+      5:'早年充滿變動，可能搬家、換學校、或家庭有變故。這讓你很早就學會了適應，但也讓你渴望穩定。',
+      6:'早年深受家庭影響，可能是家中付出最多的那個孩子，或者很早就學會了照顧別人。這段時間的功課是找到愛自己的方式。',
+      7:'早年可能比同齡人更內向、更有自己的世界。容易被誤解，但其實你只是需要更多時間思考和消化。',
+      8:'早年充滿野心與目標，非常清楚自己想要什麼。但也因為太在意結果，容易在失敗時對自己很嚴苛。',
+      9:'早年是理想主義的階段，對世界充滿期待，但也容易因為現實與期待的落差而感到失落。這段時間的功課是學習接受不完美。'
+    };
+    var midDesc={
+      1:'中年是你開始真正展現領導力的時期。事業上有機會主導重要項目或獨立創業。感情上需要學習在強勢之外展現柔軟。這段時間要特別注意不要讓工作完全取代了情感生活。',
+      2:'中年是你建立深厚人際網絡的黃金期。事業上靠合作與溝通取得突破。感情上容易遇到重要的感情，但也要注意不要為感情犧牲自己的成長。財務上開始趨於穩定，但需要建立更清晰的財務規劃。',
+      3:'中年是你創意能量最旺盛的時期。如果找到了對的方向，這段時間的成果會讓人刮目相看。感情上需要找到能欣賞你、給你回應的伴侶。事業上適合做任何需要表達與溝通的工作。',
+      4:'中年是你建立穩固基礎的關鍵期。事業上適合深耕一個領域，打造屬於自己的系統。財務上開始有能力做中長期的財務規劃。家庭責任可能加重，需要在工作與家庭之間找到平衡。',
+      5:'中年是你人生最多變化的階段。可能會有重大的職業轉換或人生方向的重新定位。感情上也可能有轉折。這段時間最重要的是保持彈性，不要執著於原本的計畫。',
+      6:'中年是你在家庭與社群中發揮影響力的時期。事業上適合做任何與照顧、服務相關的工作。感情上可能面臨家庭責任與個人需求之間的拉扯。需要學習在給予的同時也接受。',
+      7:'中年是你深化專業與智慧的時期。如果選擇了一個你真正熱愛的領域，這段時間的積累會讓你成為該領域的專家。感情上需要找到能和你有深度交流的伴侶。',
+      8:'中年是你財富與成就能量最強的時期。事業上有機會到達重要的位置。財務上如果做了好的規劃，這段時間開始看到成果。但要小心不要為了成就而忽略了健康與家庭。',
+      9:'中年是你智慧與影響力開始擴展的時期。可能開始在社群或某個領域中有了更大的影響力。感情上對另一半的要求可能比年輕時更高，需要真正的靈魂契合。'
+    };
+    var lateDesc={
+      1:'晚年的你，不再需要用行動來證明自己。這是一段享受過去耕耘成果的時期。如果年輕時建立了好的事業或人際基礎，晚年往往能過得很自在。健康上需要特別注意不要過度勞累，學會放慢腳步。',
+      2:'晚年是你人際關係最豐盛的時期。過去播下的善意種子，這時候開始收穫。家庭關係在這個階段通常趨於和諧，是享受天倫之樂的好時機。',
+      3:'晚年的你，創意能量不減反增。很多靈數3的人在退休後才真正找到自己最想做的事。這段時間適合去做年輕時因為現實限制而沒辦法做的事。',
+      4:'晚年的你，過去的努力與紀律開始帶來穩定的回報。財務上如果有好的規劃，晚年生活相對安穩。但要小心不要讓過去的勞碌習慣讓自己在應該休息的時候還停不下來。',
+      5:'晚年的你終於找到了那個一直在尋找的平衡點。比起年輕時的漂泊，這個階段更多了一份沉穩與從容。旅行與探索依然是你的樂趣，但不再是為了逃避，而是真正的享受。',
+      6:'晚年是你最被愛與被感謝的時期。過去那麼多的付出，在這個階段開始以不同的形式回來。家庭關係是你最重要的支柱，好好珍惜。',
+      7:'晚年的你，智慧與靈性能量達到頂峰。可能成為別人的精神導師或智慧來源。健康上需要特別注意睡眠品質與神經系統的調養。',
+      8:'晚年的你，如果前半生努力耕耘，這時候開始享受財務上的豐盛。但要學會把財富用在有意義的事情上，而不只是累積數字。給予比擁有更讓你感到滿足。',
+      9:'晚年是靈數9人生最圓滿的時期。過去的付出、理想與犧牲，在這個階段都有了意義。你可能成為某個社群或家庭中重要的精神支柱，你的智慧與慈悲是你最大的財富。'
+    };
+
+    var relNote={
+      1:'感情上：你的強勢有時會讓另一半覺得喘不過氣。學習在愛情中展現柔軟，是一輩子的功課。兄弟朋友間：你是那個可以依靠的人，但也要注意不要讓別人的問題全壓在你身上。',
+      2:'感情上：你付出很多，但容易得不到等值的回應，需要學會挑選值得你付出的人。朋友間：你是最好的傾聽者，但也要找到能傾聽你的朋友。',
+      3:'感情上：你需要能欣賞你、給你回應的伴侶，找到頻率相同的人很重要。父母朋友間：你是那個活絡氣氛的人，記得也給自己安靜下來的空間。',
+      4:'感情上：你重視承諾與穩定，但有時情感表達太含蓄，要刻意練習說出感受。父母關係：你可能是家中最懂事的那個，記得你也需要被照顧。',
+      5:'感情上：你渴望自由，但也渴望被愛，這兩件事需要找到平衡。朋友間：你人緣好，但深交的朋友可能不多，值得刻意培養幾段深厚的友誼。',
+      6:'感情上：你是給予型的愛人，但要記得愛自己和愛別人同樣重要。父母關係：你很可能是家中的照顧者，要注意不要讓這個角色讓你筋疲力竭。',
+      7:'感情上：你不容易敞開心扉，但一旦信任就非常深情。需要找到有耐心等你打開的伴侶。朋友間：你的朋友不多但都是真心的，這比廣泛的人脈更珍貴。',
+      8:'感情上：你在愛情中也有主導欲，要注意不要把工作模式帶進感情。兄弟間：可能有財務方面的摩擦，清楚的界線是維護關係的關鍵。',
+      9:'感情上：你對感情認真且深入，一旦愛了就很難抽身，需要學習設立健康的情感界線。朋友間：你是那個大家都喜歡找的人，但要注意不要承擔超過自己能力範圍的情緒。'
+    };
+
+    var body='';
+    body+='<div style="border-left:3px solid var(--gold);padding-left:14px;margin-bottom:20px;">';
+    body+='<p style="font-size:.88rem;font-weight:700;color:var(--gold);margin-bottom:6px;">核心課題</p>';
+    body+='<p>'+([9,6,2].includes(g.lp)?'太容易把自己的價值建立在被需要上。你需要學習：即使沒有人需要你，你依然有價值。':[1,8,4].includes(g.lp)?'太在意成就與結果，忘了享受過程。你需要學習：過程本身就是生命的意義。':'太容易把自己的情緒壓下去，假裝沒事。你需要學習：脆弱不是軟弱，而是真實。')+'</p>';
+    if(g.miss.length){
+      body+='<p style="margin-top:8px">缺數提示：你命盤中缺 '+g.miss.join('、')+' 的能量，這些是你這輩子需要有意識去培養的能力，同時也是你最常在人生中遇到課題的面向。</p>';
     }
-    body+='<p style="margin-top:8px">你的命格比較像\u300c後運型\u300d。</p>';
-    body+='<p>年輕時辛苦，中年後才慢慢走出自己的價值。</p>';
-    body+='<p style="margin-top:8px">你的運不是爆發型，是：<strong>口碑累積型。</strong></p>';
-    body+='<p style="margin-top:8px">一旦你願意：曝光、社交、經營個人品牌，運會差很多。</p>';
-    body+='<p style="margin-top:10px"><strong>此生最重要的三件事：</strong></p>';
+    body+='</div>';
+
+    // Early
+    body+='<div style="border-left:3px solid var(--jade);padding-left:14px;margin-bottom:16px;">';
+    body+='<p style="font-size:.88rem;font-weight:700;color:var(--jade);margin-bottom:6px;">早年 '+earlyAge+'</p>';
+    body+='<p>'+earlyDesc[g.lp]+'</p>';
+    body+='<p style="margin-top:8px;font-size:.82rem;color:var(--mist)">'+relNote[g.lp]+'</p>';
+    body+='</div>';
+
+    // Mid
+    body+='<div style="border-left:3px solid var(--gold);padding-left:14px;margin-bottom:16px;">';
+    body+='<p style="font-size:.88rem;font-weight:700;color:var(--gold);margin-bottom:6px;">中年 '+midAge+'</p>';
+    body+='<p>'+midDesc[g.lp]+'</p>';
+    var invNote='投資與財務：'+([1,3,5,8].includes(g.lp)?'中年是你財務能量上升期，適合做中長期投資規劃，但要避免過於冒進。':'中年財務趨於穩定，適合穩健理財，建立被動收入。');
+    body+='<p style="margin-top:8px;font-size:.82rem;color:var(--mist)">'+invNote+'</p>';
+    body+='</div>';
+
+    // Late
+    body+='<div style="border-left:3px solid var(--rust);padding-left:14px;margin-bottom:16px;">';
+    body+='<p style="font-size:.88rem;font-weight:700;color:var(--rust);margin-bottom:6px;">晚年 '+lateAge+'</p>';
+    body+='<p>'+lateDesc[g.lp]+'</p>';
+    body+='</div>';
+
+    // Summary
+    body+='<div style="background:var(--jade-lt);border-radius:6px;padding:14px 16px;margin-top:8px;">';
+    body+='<p style="font-size:.82rem;font-weight:700;color:var(--jade);margin-bottom:8px;">這輩子要學會的三件事</p>';
     body+='<p>① '+NUM[g.lp].fix+'</p>';
-    body+='<p>② '+(g.miss.length?'有意識培養缺數能量（缺'+g.miss.join('、')+'）':'善用完整的九宮格能量')+'</p>';
-    body+='<p>③ '+([9,6,2].includes(g.lp)?'學會先愛自己，再去愛別人':[1,8].includes(g.lp)?'在成就之外找到真正的生命意義':'在行動與沉澱之間找到自己的節奏')+'</p>';
-    html+=sec('十一','人生課題',body);
+    body+='<p>② '+(g.miss.length?'有意識培養缺'+g.miss.join('、')+' 的能量，把人生功課變成人生優勢':'善用命盤完整的能量，每個數字都是你的資源')+'</p>';
+    body+='<p>③ '+([9,6,2].includes(g.lp)?'學會先愛自己，你的能量才能長期穩定地付出給別人':[1,8].includes(g.lp)?'在成就之外找到真正的生命意義，讓成功有溫度':'在行動與沉澱之間找到自己的節奏，動靜皆宜才能走得長遠')+'</p>';
+    body+='</div>';
+
+    html+=sec('十一','人生課題與命運走勢',body);
   }
 
   if(id==='p12'){
@@ -776,14 +900,53 @@ function genPage(id){
   }
 
   if(id==='p14'){
-    var body='<p style="margin-bottom:12px;"><strong>'+g.ty+'年 流月能量總覽</strong>（流年數：'+g.yf+'）</p>';
-    body+='<table class="tbl"><thead><tr><th>月份</th><th>流月數</th><th>主題</th><th>本月建議</th></tr></thead><tbody>';
+    // 每個流月數的好事與注意
+    var MONTH_GOOD={
+      1:'新計畫啟動順利，有機會認識新的合作夥伴，行動力強的月份，主動出擊效果好',
+      2:'人際關係和諧，溝通順暢，感情有進展的好時機，合作提案容易得到正面回應',
+      3:'創意能量旺盛，適合做品牌曝光、社群發文、學習新技能，人脈拓展效果好',
+      4:'執行力強，計畫推進順利，財務規劃落實的好月份，踏實努力有明顯成果',
+      5:'機遇突然出現，變化帶來好消息，旅行或新嘗試容易有意外收穫',
+      6:'家庭關係和諧，感情甜蜜，服務業業績好，口碑推薦增加，貴人來自女性',
+      7:'直覺準確，研究或深度學習有收穫，靜心後做出的決策往往正確',
+      8:'財運旺，業績有機會突破，談判或合約簽訂順利，努力看到具體回報',
+      9:'人際關係圓滿，適合整理與總結，舊緣分重逢，感謝與回饋帶來好能量'
+    };
+    var MONTH_WARN={
+      1:'過於衝動，容易忽略細節，與人溝通時要注意語氣不要太強硬',
+      2:'情緒敏感，容易想太多，避免因小事影響心情，不宜做重大決定',
+      3:'容易分心，說多做少，避免承諾太多卻無法兌現，財務上小心衝動消費',
+      4:'壓力較大，容易鑽牛角尖，不宜過於固執，要適時放鬆',
+      5:'變動較大，口舌是非較多，避免衝動決定，感情容易有波折',
+      6:'付出過多容易疲憊，避免替別人做太多決定，財務上注意大額支出',
+      7:'容易過度思慮，難以做決定，避免鑽牛角尖，不宜太封閉自己',
+      8:'壓力大，容易因錢或工作起爭執，健康要注意不要過勞，脾氣控制',
+      9:'容易感傷或放不下，避免拖延，做好結束與交接，不要讓舊事耗能'
+    };
+
+    var body='';
+    body+='<div style="background:var(--gold-pale);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:.85rem;line-height:1.8;">';
+    body+='<strong>流年 '+g.yf+'（'+YEAR[g.yf].t+'）</strong>｜'+g.ty+'年整體走勢<br>'+YEAR[g.yf].d;
+    body+='</div>';
+
     for(var mo=1;mo<=12;mo++){
       var mf=monthFlow(g.yf,mo);
-      body+='<tr><td><span class="mn">'+mo+'月</span></td><td><span class="mf">'+mf+'</span></td><td>'+NUM[mf].label+'</td><td>'+MONTH_TIPS[mo-1]+'</td></tr>';
+      var isGood=[1,3,6,8].includes(mf);
+      var bgCol=isGood?'#f0faf5':'#fff8f5';
+      var borderCol=isGood?'#a0ccc4':'#f0c8c0';
+      body+='<div style="border:1px solid '+borderCol+';border-radius:6px;padding:14px 16px;margin-bottom:10px;background:'+bgCol+';">';
+      body+='<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:8px;">';
+      body+='<span style="font-family:\'Noto Serif TC\',serif;font-size:1.1rem;font-weight:700;color:var(--gold);">'+mo+'月</span>';
+      body+='<span style="font-family:\'Noto Serif TC\',serif;font-size:1.5rem;font-weight:900;color:'+(isGood?'var(--jade)':'var(--rust)')+';">'+mf+'</span>';
+      body+='<span style="font-size:.82rem;font-weight:700;color:'+(isGood?'var(--jade)':'var(--rust)')+';">'+NUM[mf].label+'</span>';
+      body+='<span style="font-size:.75rem;color:var(--mist);margin-left:auto;">'+(isGood?'✦ 好運月':'⚠ 留意月')+'</span>';
+      body+='</div>';
+      body+='<div style="font-size:.82rem;line-height:1.8;">';
+      body+='<span style="color:var(--jade);font-weight:700;">好事：</span>'+MONTH_GOOD[mf]+'<br>';
+      body+='<span style="color:var(--rust);font-weight:700;">注意：</span>'+MONTH_WARN[mf];
+      body+='</div></div>';
     }
-    body+='</tbody></table>';
-    html+=sec('十四','流月 '+g.ty+'年',body);
+    html+=sec('十四','流月詳解｜'+g.ty+'年每月運勢',body);
   }
 
   if(id==='p15'){
@@ -844,36 +1007,48 @@ function item(label,val,cls){
 }
 
 function genPalace(counts,miss){
-  var ORDER=[7,8,9,4,5,6,1,2,3];
-  var missSet={};miss.forEach(function(n){missSet[n]=true;});
-  var html='<div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;">';
-  html+='<div class="palace">';
-  ORDER.forEach(function(pos){
-    var cnt=counts[pos];
-    var cls='pc';
-    if(cnt===0) cls+=' miss';
-    else if(cnt>=2) cls+=' multi';
-    html+='<div class="'+cls+'"><span class="pnum">'+pos+'</span><span class="pval">'+(cnt===0?'○':String(pos).repeat(Math.min(cnt,4)))+'</span></div>';
-  });
-  html+='</div>';
-  html+='<div style="flex:1;min-width:150px;">';
-  html+='<div style="font-size:.78rem;color:var(--mist);line-height:2;margin-bottom:8px;"><span style="color:var(--gold)">●</span> 金色＝出現<br><span style="color:var(--jade)">●</span> 綠色＝重複<br><span style="color:#e8c4b8">●</span> 淡粉＝缺數</div>';
-  if(miss.length){
-    html+='<div style="margin-bottom:6px;font-size:.78rem;font-weight:700;color:var(--rust);">缺數：</div>';
-    html+='<div class="chip-row">';
-    miss.forEach(function(n){html+='<span class="chip r">缺'+n+'</span>';});
-    html+='</div>';
-  } else {
-    html+='<p style="font-size:.8rem;color:var(--jade);">✦ 1～9 全數具備</p>';
-  }
-  var multi=Object.keys(counts).filter(function(k){return counts[k]>=2;});
-  if(multi.length){
-    html+='<div style="margin-top:8px;font-size:.78rem;font-weight:700;color:var(--jade);">強化數：</div>';
-    html+='<div class="chip-row">';
-    multi.forEach(function(k){html+='<span class="chip j">'+k+'×'+counts[k]+'</span>';});
+  // 純數字顯示，不用格子
+  var html='';
+
+  // 命盤數字一覽
+  html+='<div style="margin-bottom:20px;">';
+  html+='<div style="font-size:.8rem;color:var(--mist);margin-bottom:10px;letter-spacing:.06em;">命盤數字分布（1988/8/18）</div>';
+  html+='<div style="display:flex;flex-wrap:wrap;gap:10px;">';
+  for(var i=1;i<=9;i++){
+    var cnt=counts[i];
+    var isMiss=(cnt===0);
+    var isMulti=(cnt>=2);
+    var bg=isMiss?'#fff0ee':isMulti?'var(--jade-lt)':'var(--gold-pale)';
+    var border=isMiss?'#f0c8c0':isMulti?'#a0ccc4':'var(--gold-lt)';
+    var col=isMiss?'var(--rust)':isMulti?'var(--jade)':'var(--gold)';
+    html+='<div style="background:'+bg+';border:1.5px solid '+border+';border-radius:6px;padding:10px 14px;text-align:center;min-width:52px;">';
+    html+='<div style="font-family:\'Noto Serif TC\',serif;font-size:1.6rem;font-weight:900;color:'+col+';line-height:1;">'+i+'</div>';
+    html+='<div style="font-size:.65rem;color:'+col+';margin-top:4px;">'+(isMiss?'缺':cnt+'次')+'</div>';
     html+='</div>';
   }
   html+='</div></div>';
+
+  // 缺數
+  if(miss.length){
+    html+='<div style="margin-bottom:14px;">';
+    html+='<div style="font-size:.82rem;font-weight:700;color:var(--rust);margin-bottom:8px;">缺數（人生功課）：</div>';
+    html+='<div class="chip-row">';
+    miss.forEach(function(n){html+='<span class="chip r">缺 '+n+'</span>';});
+    html+='</div></div>';
+  } else {
+    html+='<p style="color:var(--jade);font-size:.85rem;margin-bottom:14px;">✦ 1～9 全數具備，能量完整圓滿</p>';
+  }
+
+  // 強化數
+  var multi=Object.keys(counts).filter(function(k){return counts[k]>=2;});
+  if(multi.length){
+    html+='<div>';
+    html+='<div style="font-size:.82rem;font-weight:700;color:var(--jade);margin-bottom:8px;">強化數（天生優勢）：</div>';
+    html+='<div class="chip-row">';
+    multi.forEach(function(k){html+='<span class="chip j">'+k+' 出現 '+counts[k]+' 次</span>';});
+    html+='</div></div>';
+  }
+
   return html;
 }
 
