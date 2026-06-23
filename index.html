@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>靈數命盤｜完整解析系統</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+:root{
+  --ink:#12100a;--bg:#f5f0e6;--gold:#b8923a;--gold-lt:#e8d5a0;--gold-pale:#faf6eb;
+  --jade:#2a5e50;--jade-lt:#e4f0ec;--rust:#7d3520;--mist:#6b7280;--border:#d6c99a;--card:#fffdf6;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
+/* HEADER */
+.header{background:var(--ink);padding:18px 20px;display:flex;align-items:center;gap:12px;}
+.logo-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;width:36px;height:36px;padding:4px;border:1.5px solid var(--gold);}
+.logo-grid span{background:var(--gold);opacity:.5;}
+.logo-grid span:nth-child(5){opacity:1;}
+.header h1{font-family:'Noto Serif TC',serif;color:var(--gold);font-size:1.1rem;letter-spacing:.1em;}
+.header p{color:rgba(255,255,255,.4);font-size:.7rem;margin-top:2px;letter-spacing:.06em;}
+/* NAV */
+.nav{background:var(--ink);display:flex;border-top:1px solid rgba(255,255,255,.08);overflow-x:auto;}
+.nav a{color:rgba(255,255,255,.45);padding:10px 14px;font-size:.78rem;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;text-decoration:none;transition:all .2s;}
+.nav a.on{color:var(--gold);border-bottom-color:var(--gold);}
+/* VIEWS */
+.view{display:none;}.view.on{display:block;}
+.wrap{max-width:680px;margin:0 auto;padding:24px 16px 80px;}
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:22px 20px;margin-bottom:14px;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--jade));}
+.card-title{font-family:'Noto Serif TC',serif;font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:16px;letter-spacing:.06em;}
+/* FORM */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+.row1{margin-bottom:10px;}
+.field label{display:block;font-size:.72rem;color:var(--mist);letter-spacing:.06em;margin-bottom:4px;}
+.field select,.field input{width:100%;border:1px solid var(--border);background:var(--bg);padding:9px 10px;font-family:'Noto Sans TC',sans-serif;font-size:.88rem;color:var(--ink);border-radius:4px;outline:none;}
+.field select:focus,.field input:focus{border-color:var(--gold);}
+.btn{display:block;width:100%;padding:13px;background:var(--ink);color:var(--gold);border:none;border-radius:4px;font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;letter-spacing:.1em;cursor:pointer;margin-top:8px;}
+.btn:hover{background:#2d2010;}
+/* PAGES */
+.pages{display:none;}.pages.on{display:block;}
+.page-nav{display:flex;overflow-x:auto;gap:0;margin-bottom:16px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:4px;}
+.pnav-btn{flex-shrink:0;padding:7px 12px;border:none;background:transparent;border-radius:4px;font-size:.75rem;cursor:pointer;color:var(--mist);font-family:'Noto Sans TC',sans-serif;white-space:nowrap;}
+.pnav-btn.on{background:var(--ink);color:var(--gold);font-weight:700;}
+.page{display:none;}.page.on{display:block;}
+/* SECTION */
+.sec{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px;margin-bottom:12px;}
+.sec-head{font-family:'Noto Serif TC',serif;font-size:.9rem;font-weight:700;color:var(--jade);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.sec-icon{width:22px;height:22px;background:var(--jade);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.62rem;flex-shrink:0;}
+.sec-body{font-size:.86rem;line-height:1.95;color:#2a200e;}
+.sec-body p{margin-bottom:8px;}
+/* PALACE */
+.palace{display:grid;grid-template-columns:repeat(3,80px);grid-template-rows:repeat(3,80px);gap:2px;background:var(--border);border:2px solid var(--border);border-radius:4px;overflow:hidden;}
+.pc{background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;}
+.pc .pnum{position:absolute;top:4px;left:6px;font-size:.55rem;color:var(--border);}
+.pc .pval{font-family:'Noto Serif TC',serif;font-size:1.6rem;font-weight:900;color:var(--gold);line-height:1;}
+.pc.empty .pval{color:var(--border);font-weight:300;font-size:1.3rem;}
+.pc.multi .pval{color:var(--jade);}
+.pc.miss{background:#fdf6f4;}
+.pc.miss .pval{color:#e8c4b8;}
+/* CHIPS */
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;}
+.chip{padding:4px 10px;border-radius:3px;font-size:.8rem;font-weight:700;font-family:'Noto Serif TC',serif;border:1px solid;}
+.chip.g{background:var(--gold-pale);color:#8a6820;border-color:var(--gold-lt);}
+.chip.j{background:var(--jade-lt);color:var(--jade);border-color:#a0ccc4;}
+.chip.r{background:#fff0ee;color:var(--rust);border-color:#f0c8c0;}
+/* BIG NUM */
+.bnum{font-family:'Noto Serif TC',serif;font-size:4rem;font-weight:900;color:var(--gold);line-height:1;}
+.bnum-row{display:flex;gap:24px;flex-wrap:wrap;margin:12px 0;}
+.bnum-item .bl{font-size:.7rem;color:var(--mist);letter-spacing:.06em;margin-bottom:4px;}
+.bnum-item .bv{font-family:'Noto Serif TC',serif;font-size:2.2rem;font-weight:900;color:var(--gold);line-height:1;}
+.bnum-item.j .bv{color:var(--jade);}
+.bnum-item.r .bv{color:var(--rust);}
+/* STAR */
+.stars{color:var(--gold);letter-spacing:2px;font-size:1rem;}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:8px;}
+.tbl th{background:var(--ink);color:var(--gold);padding:8px 10px;text-align:left;font-size:.76rem;letter-spacing:.04em;}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.6;}
+.tbl tr:nth-child(even) td{background:var(--gold-pale);}
+.tbl .mn{font-family:'Noto Serif TC',serif;font-weight:700;color:var(--gold);}
+.tbl .mf{font-family:'Noto Serif TC',serif;font-weight:700;color:var(--jade);}
+/* CONN */
+.conn{background:var(--gold-pale);border:1px solid var(--gold-lt);border-radius:4px;padding:14px 16px;margin-bottom:10px;}
+.conn-t{font-family:'Noto Serif TC',serif;font-size:.9rem;font-weight:700;color:var(--gold);margin-bottom:6px;}
+.conn-d{font-size:.83rem;line-height:1.85;color:#3d2d10;}
+/* EXPORT */
+.export-bar{background:var(--ink);border-radius:6px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.export-bar p{color:rgba(255,255,255,.6);font-size:.82rem;}
+.ebtn{background:var(--gold);color:var(--ink);border:none;padding:9px 18px;border-radius:4px;font-size:.82rem;font-weight:700;cursor:pointer;}
+/* CRM */
+.crm-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.crm-header h2{font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;}
+.crm-add{background:var(--jade);color:#fff;border:none;padding:8px 16px;border-radius:4px;font-size:.82rem;cursor:pointer;}
+.client-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;}
+.cc-info h3{font-size:.92rem;font-weight:700;margin-bottom:4px;}
+.cc-info p{font-size:.78rem;color:var(--mist);line-height:1.6;}
+.cc-btns{display:flex;gap:6px;flex-shrink:0;}
+.cc-btn{padding:6px 12px;border:1px solid var(--border);border-radius:3px;font-size:.75rem;cursor:pointer;background:var(--bg);}
+.cc-btn.primary{background:var(--jade);color:#fff;border-color:var(--jade);}
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;}
+.modal-bg.on{display:flex;}
+.modal{background:#fff;border-radius:8px;padding:24px;width:90%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.modal h2{font-family:'Noto Serif TC',serif;font-size:1rem;font-weight:700;margin-bottom:16px;}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+.modal-btn{padding:9px 20px;border-radius:4px;border:none;cursor:pointer;font-size:.85rem;font-weight:700;}
+.modal-btn.save{background:var(--jade);color:#fff;}
+.modal-btn.cancel{background:var(--bg);border:1px solid var(--border);}
+/* LOADING */
+#loading{display:none;text-align:center;padding:48px 0;}
+#loading.on{display:block;}
+.spin{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+/* PRINT */
+@media print{
+  .header,.nav,.export-bar,.page-nav,#loading{display:none!important;}
+  .pages.on,.page.on{display:block!important;}
+  .page{display:block!important;}
+  body{background:#fff;}
+}
+@media(max-width:480px){
+  .row2,.row3{grid-template-columns:1fr;}
+  .palace{grid-template-columns:repeat(3,72px);grid-template-rows:repeat(3,72px);}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo-grid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div><h1>靈數命盤解析</h1><p>完整 17 頁深度解讀系統</p></div>
+</div>
+
+<div class="nav">
+  <a class="on" onclick="goNav('analyze',this)">📋 輸入解析</a>
+  <a onclick="goNav('crm',this)">👤 客戶管理</a>
+</div>
+
+<!-- ══ ANALYZE VIEW ══ -->
+<div id="analyze" class="view on">
+<div class="wrap">
+
+  <div class="card">
+    <div class="card-title">基本資料</div>
+    <div class="row2">
+      <div class="field"><label>姓名</label><input type="text" id="f-name" placeholder="輸入姓名"></div>
+      <div class="field"><label>性別</label>
+        <select id="f-gender"><option value="female">女性</option><option value="male">男性</option></select>
+      </div>
+    </div>
+    <div class="row3">
+      <div class="field"><label>出生年</label>
+        <select id="f-year">
+          <option value="">請選擇</option>
+          <option value="2005">2005</option><option value="2004">2004</option><option value="2003">2003</option><option value="2002">2002</option><option value="2001">2001</option>
+          <option value="2000">2000</option><option value="1999">1999</option><option value="1998">1998</option><option value="1997">1997</option><option value="1996">1996</option>
+          <option value="1995">1995</option><option value="1994">1994</option><option value="1993">1993</option><option value="1992">1992</option><option value="1991">1991</option>
+          <option value="1990">1990</option><option value="1989">1989</option><option value="1988">1988</option><option value="1987">1987</option><option value="1986">1986</option>
+          <option value="1985">1985</option><option value="1984">1984</option><option value="1983">1983</option><option value="1982">1982</option><option value="1981">1981</option>
+          <option value="1980">1980</option><option value="1979">1979</option><option value="1978">1978</option><option value="1977">1977</option><option value="1976">1976</option>
+          <option value="1975">1975</option><option value="1974">1974</option><option value="1973">1973</option><option value="1972">1972</option><option value="1971">1971</option>
+          <option value="1970">1970</option><option value="1969">1969</option><option value="1968">1968</option><option value="1967">1967</option><option value="1966">1966</option>
+          <option value="1965">1965</option><option value="1964">1964</option><option value="1963">1963</option><option value="1962">1962</option><option value="1961">1961</option>
+          <option value="1960">1960</option><option value="1959">1959</option><option value="1958">1958</option><option value="1957">1957</option><option value="1956">1956</option>
+          <option value="1955">1955</option><option value="1954">1954</option><option value="1953">1953</option><option value="1952">1952</option><option value="1951">1951</option>
+          <option value="1950">1950</option><option value="1949">1949</option><option value="1948">1948</option><option value="1947">1947</option><option value="1946">1946</option>
+          <option value="1945">1945</option><option value="1944">1944</option><option value="1943">1943</option><option value="1942">1942</option><option value="1941">1941</option>
+          <option value="1940">1940</option>
+        </select>
+      </div>
+      <div class="field"><label>出生月</label>
+        <select id="f-month">
+          <option value="">請選擇</option>
+          <option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option>
+          <option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option>
+          <option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+        </select>
+      </div>
+      <div class="field"><label>出生日</label>
+        <select id="f-day">
+          <option value="">請選擇</option>
+          <option value="1">1日</option><option value="2">2日</option><option value="3">3日</option><option value="4">4日</option><option value="5">5日</option>
+          <option value="6">6日</option><option value="7">7日</option><option value="8">8日</option><option value="9">9日</option><option value="10">10日</option>
+          <option value="11">11日</option><option value="12">12日</option><option value="13">13日</option><option value="14">14日</option><option value="15">15日</option>
+          <option value="16">16日</option><option value="17">17日</option><option value="18">18日</option><option value="19">19日</option><option value="20">20日</option>
+          <option value="21">21日</option><option value="22">22日</option><option value="23">23日</option><option value="24">24日</option><option value="25">25日</option>
+          <option value="26">26日</option><option value="27">27日</option><option value="28">28日</option><option value="29">29日</option><option value="30">30日</option>
+          <option value="31">31日</option>
+        </select>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>感情狀態</label>
+        <select id="f-status"><option value="single">單身</option><option value="dating">交往中</option><option value="married">已婚</option><option value="divorced">離婚／分手後</option></select>
+      </div>
+      <div class="field"><label>解析年度</label>
+        <select id="f-year2">
+          <option value="2025">2025年</option><option value="2026" selected>2026年</option><option value="2027">2027年</option><option value="2028">2028年</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" onclick="runAnalysis()">✦ 開始解析命盤</button>
+  </div>
+
+  <div id="loading"><div class="spin"></div><p style="color:var(--mist);font-size:.88rem;letter-spacing:.08em">命盤推演中…</p></div>
+
+  <!-- RESULT PAGES -->
+  <div id="result-pages" class="pages">
+    <div class="export-bar">
+      <p id="r-title">靈數命盤報告</p>
+      <div style="display:flex;gap:8px">
+        <button class="ebtn" onclick="copyCurrentPage()">📋 複製本頁</button>
+        <button class="ebtn" onclick="copyReport()">📋 複製全部</button>
+        <button class="ebtn" onclick="window.print()">🖨 列印</button>
+      </div>
+    </div>
+    <div class="page-nav" id="page-nav"></div>
+    <!-- pages injected by JS -->
+    <div id="pages-container"></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ CRM VIEW ══ -->
+<div id="crm" class="view">
+<div class="wrap">
+  <div class="crm-header">
+    <h2>客戶管理</h2>
+    <button class="crm-add" onclick="openAddClient()">＋ 新增客戶</button>
+  </div>
+  <div id="client-list"></div>
+</div>
+</div>
+
+<!-- ══ CLIENT MODAL ══ -->
+<div class="modal-bg" id="client-modal">
+  <div class="modal">
+    <h2 id="modal-title">新增客戶</h2>
+    <div class="row2">
+      <div class="field"><label>姓名</label><input type="text" id="c-name"></div>
+      <div class="field"><label>電話</label><input type="text" id="c-phone" placeholder="0912..."></div>
+    </div>
+    <div class="row3">
+      <div class="field"><label>出生年</label><input type="number" id="c-year" placeholder="1985"></div>
+      <div class="field"><label>出生月</label><input type="number" id="c-month" placeholder="6" min="1" max="12"></div>
+      <div class="field"><label>出生日</label><input type="number" id="c-day" placeholder="14" min="1" max="31"></div>
+    </div>
+    <div class="row1">
+      <div class="field"><label>備注</label><input type="text" id="c-note" placeholder="過敏、偏好、注意事項…"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+      <button class="modal-btn save" onclick="saveClient()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<div id="copy-buf" style="display:none;white-space:pre-wrap"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════════════
+function goNav(id, el) {
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('on'); });
+  document.querySelectorAll('.nav a').forEach(function(a){ a.classList.remove('on'); });
+  document.getElementById(id).classList.add('on');
+  el.classList.add('on');
+  if(id==='crm') renderClients();
+}
+
+// ══════════════════════════════════════════════════════
+// NUMEROLOGY CORE
+// ══════════════════════════════════════════════════════
+function r9(n){ while(n>9){ n=String(n).split('').reduce(function(a,b){return a+parseInt(b);},0); } return n; }
+
+function lifePath(y,m,d){
+  var s=0;
+  String(y).split('').forEach(function(c){s+=parseInt(c);});
+  String(m).padStart(2,'0').split('').forEach(function(c){s+=parseInt(c);});
+  String(d).padStart(2,'0').split('').forEach(function(c){s+=parseInt(c);});
+  return r9(s);
+}
+function palaceCounts(y,m,d){
+  var digits=[];
+  String(y).split('').forEach(function(c){digits.push(parseInt(c));});
+  String(m).padStart(2,'0').split('').forEach(function(c){digits.push(parseInt(c));});
+  String(d).padStart(2,'0').split('').forEach(function(c){digits.push(parseInt(c));});
+  var c={};for(var i=1;i<=9;i++) c[i]=0;
+  digits.forEach(function(x){if(x>0) c[x]++;});
+  return c;
+}
+function getConns(counts){
+  var p={};for(var k in counts){if(counts[k]>0)p[k]=true;}
+  return ["147","258","369","456","789","123","159","168","357"].filter(function(l){
+    return l.split('').every(function(n){return p[n];});
+  });
+}
+function getMiss(counts){ return Object.keys(counts).filter(function(k){return counts[k]===0;}).map(Number); }
+function yearFlow(y,m,d,ty){
+  var lp=lifePath(y,m,d);
+  var ys=0; String(ty).split('').forEach(function(c){ys+=parseInt(c);});
+  return r9(lp+ys);
+}
+function monthFlow(yf,mo){ return r9(yf+mo); }
+
+// Zodiac & Constellation
+function zodiac(y){
+  var z=['鼠','牛','虎','兔','龍','蛇','馬','羊','猴','雞','狗','豬'];
+  return z[(y-4)%12]+'年';
+}
+function constellation(m,d){
+  // 正確星座日期對照
+  if((m===1&&d>=20)||(m===2&&d<=18)) return '水瓶座';
+  if((m===2&&d>=19)||(m===3&&d<=20)) return '雙魚座';
+  if((m===3&&d>=21)||(m===4&&d<=19)) return '牡羊座';
+  if((m===4&&d>=20)||(m===5&&d<=20)) return '金牛座';
+  if((m===5&&d>=21)||(m===6&&d<=21)) return '雙子座';
+  if((m===6&&d>=22)||(m===7&&d<=22)) return '巨蟹座';
+  if((m===7&&d>=23)||(m===8&&d<=22)) return '獅子座';
+  if((m===8&&d>=23)||(m===9&&d<=22)) return '處女座';
+  if((m===9&&d>=23)||(m===10&&d<=23)) return '天秤座';
+  if((m===10&&d>=24)||(m===11&&d<=22)) return '天蠍座';
+  if((m===11&&d>=23)||(m===12&&d<=21)) return '射手座';
+  return '摩羯座';
+}
+
+// ══════════════════════════════════════════════════════
+// RULE DB
+// ══════════════════════════════════════════════════════
+var NUM={
+  1:{label:'獨立‧領導‧開創',
+     good:'自信、行動力強、有主見、開創精神旺盛',
+     bad:'容易固執、難以妥協、有時過於強勢',
+     fix:'練習傾聽他人意見，學會適時放手',
+     job:'創業、主管、業務、開拓型職位',
+     love:'需要有自己空間的伴侶，忌過度依賴型'},
+  2:{label:'合作‧感受‧包容',
+     good:'細膩敏感、善於溝通、體貼周到',
+     bad:'容易過度在意他人、缺乏安全感',
+     fix:'練習建立內在安全感，學會說不',
+     job:'輔導、諮詢、人資、服務業、公關',
+     love:'需要穩定安全感，與體貼型伴侶最合'},
+  3:{label:'表達‧創意‧樂觀',
+     good:'表達力強、創意豐沛、樂觀開朗',
+     bad:'容易分心、情緒起伏、難以深入',
+     fix:'培養專注力，深耕一個領域',
+     job:'教師、媒體、創作、業務、社群',
+     love:'需要欣賞與回應的伴侶，忌沉悶型'},
+  4:{label:'穩定‧責任‧實踐',
+     good:'踏實可靠、執行力強、重視承諾',
+     bad:'較為保守、難以應對突變、有時太鑽牛角尖',
+     fix:'練習彈性思維，接受不確定性',
+     job:'工程、財務、行政、建築、管理',
+     love:'重視承諾與安全感，適合穩定型伴侶'},
+  5:{label:'自由‧變化‧平衡',
+     good:'適應力強、充滿活力、多才多藝',
+     bad:'容易散漫、難以聚焦、怕被束縛',
+     fix:'練習聚焦與穩定，建立日常紀律',
+     job:'業務、旅遊、自由工作者、斜槓創業',
+     love:'需要自由空間，與獨立型伴侶最合'},
+  6:{label:'愛‧家庭‧照顧',
+     good:'責任感強、溫暖體貼、善於調和關係',
+     bad:'容易犧牲自我、過度付出、擔憂過多',
+     fix:'學會愛自己，設立健康的情感界線',
+     job:'醫療、教育、社工、療癒、美容養生',
+     love:'給予型，需要懂得感恩的伴侶'},
+  7:{label:'思考‧研究‧內省',
+     good:'深度思考、靈性敏感、洞察力強',
+     bad:'容易封閉、多疑、難以信任他人',
+     fix:'練習開放心態，學會接受不完美',
+     job:'研究、心理、技術、命理、靈性',
+     love:'需要深度交流的伴侶，重視靈魂契合'},
+  8:{label:'成就‧財富‧管理',
+     good:'目標明確、管理天賦、商業頭腦強',
+     bad:'容易太在意成就、忽略情感、過於強勢',
+     fix:'練習放鬆，在成就之外找到生命意義',
+     job:'企業管理、金融、投資、房地產',
+     love:'需要尊重其成就的伴侶，忌依附型'},
+  9:{label:'智慧‧奉獻‧慈悲',
+     good:'理想主義、有大格局、感受力極強、天生療癒者',
+     bad:'容易承擔他人情緒、內心孤獨、對感情太認真',
+     fix:'學習只為自己而活，建立情感界線',
+     job:'身心靈、療癒、推拿、藝術、靈性指導',
+     love:'感情認真深入，需要真正懂自己的人'}
+};
+
+var CONN={
+  "147":{name:'行動力線（權力線）',
+    who:'你是那種說到做到的人。目標感強，不喜歡拖延，有時候別人還在討論，你已經開始動了。天生適合創業或帶領別人，但也容易因為太有主見讓身邊的人覺得有壓力。',
+    event:'事業上容易走得比同齡人快，年輕就有機會主導重要決策。感情上可能因為太強勢讓對方喘不過氣。財務上有能力賺錢，但也花得快。',
+    advice:'學會等待，不是每件事都要你來推。讓身邊的人也有機會發揮，你的領導力會更加完整。'},
+  "258":{name:'情感線',
+    who:'你是極度敏感的人，對他人情緒有近乎直覺的感知。走進一個空間，馬上能感受到氣氛。非常適合服務、療癒、陪伴類工作，但特別容易被他人負能量影響。',
+    event:'感情上投入非常深，容易受傷。家庭關係對你影響極深，原生家庭的模式很可能複製到親密關係裡。財務上容易因情感做出不理性決定。',
+    advice:'為自己建立情感防護罩。服務他人是天賦，但不能讓自己的能量完全耗盡。每天給自己獨處充電時間。'},
+  "369":{name:'智慧線',
+    who:'你有非常強的洞察力，能看穿事情的本質。說話往往一針見血，看人很準。學什麼都快，但也因為學得快容易淺嚐即止。',
+    event:'很多做技術、命理、身體調理、能量療癒的人都有這條線。你可能常常一摸就知道哪裡有問題，甚至客人還沒開口你就感覺到了。',
+    advice:'你的直覺是天賦，要學會說對的時機。定期輸出你的知識（寫作、教學、分享），讓智慧線能量持續流動。'},
+  "456":{name:'組織管理線',
+    who:'你有天生的規劃與執行能力，做事有條理，重視流程與效率。別人眼中混亂的事情，你能看出結構然後整理好。適合管理職、獨立創業。',
+    event:'事業上容易早早承擔重要責任。家庭中往往是扛起責任的那個人，長子長女效應明顯。財務上擅長規劃，但有時過於保守錯失機會。',
+    advice:'最需要學習的是授權。不是所有事都要自己做才放心，培養身邊的人，才能讓影響力真正放大。'},
+  "789":{name:'貴人線',
+    who:'你這輩子不缺貴人。人生低潮的時候，總會有人在關鍵時刻拉你一把。貴人往往是客戶、女性、年長者或靈性圈的人，帶有讓人想幫助你的氣質。',
+    event:'前半生可能靠自己硬撐，大約三十五歲之後開始發現人脈的力量，越來越多貴人出現。晚年靠口碑與人際關係活得最滋潤。',
+    advice:'學會接受幫助。越願意開口求助，貴人越快出現。同時你自己也是別人的貴人，多付出能量加倍回來。'},
+  "123":{name:'創造線（地軸線）',
+    who:'你具備從無到有的創造能量。從想法到協調到表達，能把腦中的畫面轉化成真實的東西。適合創作、教學、或任何把抽象概念具體化的工作。',
+    event:'年輕時嘗試很多不同的事，看起來有點散，但其實都在累積。大約三十歲後找到核心方向，之後的發展讓人刮目相看。',
+    advice:'給自己一個主線。你的創造力是寶，但需要明確方向。找到最想深耕的一件事，其他作為副線，不要同時主打太多。'},
+  "159":{name:'成就線',
+    who:'這是代表終將成就大事的連線。從開創到變化到智慧，你的人生注定要經歷轉折，然後在轉折後找到更高的位置。劇本通常是：年輕辛苦、中年轉型、晚年圓滿。',
+    event:'大約三十五到四十五歲之間會有一次重大的人生轉折，可能是職業、感情或人生方向的重新定位。這個轉折看起來很痛，但其實是走向更大成就的必經之路。',
+    advice:'不要逃避人生的轉折點。當一扇門關上，不要在原地停留太久，你的下一個舞台已經在等你了。'},
+  "168":{name:'財富線',
+    who:'你天生具備吸引財富的能量。行動力帶動服務與愛創造財富成就，你的賺錢方式往往是靠真心服務他人帶來的回報。越真心付出，財富越容易到來。',
+    event:'財運往往在三十歲後越來越好，前提是找到讓自己發自內心想做的事。感情上可能遇到因財務問題產生的摩擦，需要雙方對金錢觀念保持透明溝通。',
+    advice:'建立屬於自己的財富哲學。你適合以服務為核心的商業模式，思考如何幫助更多人，財富自然跟來。'},
+  "357":{name:'精神探索線',
+    who:'你天生是個靈性探索者。創意、自由、深思形成一個永遠在追問生命意義的靈魂。從小就對世界的運作方式感到好奇，對表面的解釋不滿足。',
+    event:'人生某個階段會深度投入靈性、哲學或某種信仰的探索。這不是迷信，而是靈魂需要滋養。這條線的人在療癒、藝術或精神指導方面有極深的天賦。',
+    advice:'不要壓抑對靈性的好奇心，那是天賦不是弱點。找一個系統性的靈性學習管道，讓這份探索能量有穩定的出口。'}
+};
+
+
+var MISS={
+  1:'缺1：你的一生課題是\u300c學習自信與獨立決斷\u300d。過去可能習慣依賴他人意見，或難以主動出擊。當你有意識地練習自主決策，缺1反而會成為你最大的突破點。',
+  2:'缺2：\u300c溝通與感受他人\u300d需要後天刻意培養。你外表能照顧別人，但其實不太會表達自己的脆弱。容易悶著、忍著、假裝沒事。學會傾聽與接受被照顧，是關鍵課題。',
+  3:'缺3：\u300c表達與創意\u300d需要鍛鍊。可能童年較少被鼓勵表達，一旦突破，表達能力將遠超常人。建議從寫日記或公開分享開始練習。',
+  4:'缺4：\u300c規律與紀律\u300d是需要後天建立的習慣。計畫多、執行少，難以維持日常穩定節奏。培養固定的生活與工作習慣，是最大的改善關鍵。',
+  5:'缺5：\u300c平衡感與自我中心點\u300d是此生課題。容易情緒被感情左右，遇到感情波動時工作也跟著亂。練習找到內在穩定的錨點，是一切的根本。',
+  6:'缺6：\u300c愛與照顧自己\u300d的能力需要有意識滋養。可能在情感上較為疏離，或容易忽略自己的需求。練習表達關愛、接受愛，是人際改善的核心。',
+  7:'缺7：\u300c深度思考與內省\u300d是學習功課。習慣快速行動而忽略內在整合，靜心冥想或系統性學習能讓決策品質大幅提升。',
+  8:'缺8：\u300c管理與財富意識\u300d需後天強化。對金錢可能有複雜心態，或不擅長商業規劃。建立清晰的財務目標與收支系統，能有效轉化此課題。',
+  9:'缺9：\u300c大格局與理想精神\u300d是此生發展方向。可能較專注於個人層面，難以看見更宏觀的視野。練習擴展格局、學會給予，將帶來深層的滿足感。'
+};
+
+var YEAR={
+  1:{t:'新開始‧播種',d:'九年循環的起點，啟動新計畫、建立新習慣的最佳時機。種下什麼，未來九年就收什麼。勇敢開創，不要等到完美才行動。'},
+  2:{t:'合作‧等待‧深化',d:'速度放緩，重點在關係的深化與合作的建立。耐心是最重要的功課，不宜強行推進，適合整合、等待與醞釀。'},
+  3:{t:'表達‧創意‧社交',d:'能量高漲，適合擴展人際、展示才華、學習新技能。靈感豐沛，把握機會表達自己、分享想法，讓更多人看見你。'},
+  4:{t:'建構‧紀律‧落實',d:'腳踏實地的一年，適合打地基、建制度、做系統性規劃。避免偷懶，踏實行動才能為未來累積真正的資本。'},
+  5:{t:'變化‧自由‧突破',d:'充滿變動與機遇，擁抱改變，嘗試新事物，突破舊有框架。彈性應對突發狀況，才能抓住這一年的紅利。'},
+  6:{t:'責任‧家庭‧愛',d:'家庭與關係是重點，可能承擔更多責任。以愛為出發點的付出將帶來深層滿足，適合在家庭或社群中發揮影響力。'},
+  7:{t:'內省‧深化‧靈性',d:'向內收斂，深化學習與思考。靜心、研究、精進技術是今年的主旋律。放慢外在步伐，才能獲得更深層的智慧與力量。'},
+  8:{t:'收穫‧財富‧成就',d:'努力終於可以看到回報，財運與成就運較旺。適合推進事業、談判合作、展現實力。主動出擊，收割過去努力的果實。'},
+  9:{t:'結束‧釋放‧圓滿',d:'九年循環的終點，適合清理、放下、總結。讓不再適合的人事物自然離去，為下一個新循環騰出空間與能量。'}
+};
+
+var MONTH_TIPS=[
+  '整頓內部，謹慎行事，沉澱規劃',
+  '啟動新計畫，積極播種，勇敢出擊',
+  '合作洽談，深化關係，溝通推進',
+  '新挑戰來臨，迎難而上，拓展資源',
+  '謹言慎行，避免口舌是非，情緒管理',
+  '動口生財，注意開銷，開源節流',
+  '向內沉澱，精進技術，累積實力',
+  '整理收尾，建立人脈，多社交拓展',
+  '新生能量，把握機遇，展示自己',
+  '社交擴展，展示才能，人際突破',
+  '深化合作，推進重要事項，有貴人',
+  '沉澱總結，財務整理，為明年布局'
+];
+
+// ══════════════════════════════════════════════════════
+// GENERATE PAGES
+// ══════════════════════════════════════════════════════
+var G={};
+
+function runAnalysis(){
+  var name=document.getElementById('f-name').value.trim()||'（未填姓名）';
+  var gender=document.getElementById('f-gender').value;
+  var y=parseInt(document.getElementById('f-year').value);
+  var m=parseInt(document.getElementById('f-month').value);
+  var d=parseInt(document.getElementById('f-day').value);
+  var status=document.getElementById('f-status').value;
+  var ty=parseInt(document.getElementById('f-year2').value);
+
+  if(!y||!m||!d){ alert('請選擇完整的出生年月日'); return; }
+
+  document.getElementById('loading').classList.add('on');
+  document.getElementById('result-pages').classList.remove('on');
+
+  setTimeout(function(){
+    var lp=lifePath(y,m,d);
+    var inn=r9(m+d);
+    var acq=r9(String(y).split('').reduce(function(a,b){return a+parseInt(b);},0));
+    var pers=r9(d);
+    var dest=lifePath(y,m,d); // 命運數同生命靈數算法
+    var birth=r9(d);
+    var counts=palaceCounts(y,m,d);
+    var conns=getConns(counts);
+    var miss=getMiss(counts);
+    var yf=yearFlow(y,m,d,ty);
+    var zo=zodiac(y);
+    var cons=constellation(m,d);
+    var smap={single:'單身',dating:'交往中',married:'已婚',divorced:'離婚／分手後'};
+
+    G={name:name,gender:gender,y:y,m:m,d:d,status:smap[status],ty:ty,
+       lp:lp,inn:inn,acq:acq,pers:pers,dest:dest,birth:birth,
+       counts:counts,conns:conns,miss:miss,yf:yf,zo:zo,cons:cons};
+
+    buildPages();
+    document.getElementById('r-title').textContent=name+'｜'+y+'/'+m+'/'+d+' 靈數命盤';
+    document.getElementById('loading').classList.remove('on');
+    document.getElementById('result-pages').classList.add('on');
+    buildCopy();
+  },600);
+}
+
+var PAGE_DEFS=[
+  {id:'p1',label:'基本資料'},
+  {id:'p2',label:'九宮格'},
+  {id:'p3',label:'數字能量'},
+  {id:'p4',label:'缺數分析'},
+  {id:'p5',label:'連線能量'},
+  {id:'p6',label:'性格分析'},
+  {id:'p7',label:'財運'},
+  {id:'p8',label:'感情婚姻'},
+  {id:'p9',label:'健康'},
+  {id:'p10',label:'事業'},
+  {id:'p11',label:'人生課題'},
+  {id:'p12',label:'天賦排行'},
+  {id:'p13',label:'流年'},
+  {id:'p14',label:'流月'},
+  {id:'p15',label:'AI總結'},
+  {id:'p16',label:'元辰宮'},
+  {id:'p17',label:'建議'}
+];
+
+function buildPages(){
+  // Nav
+  var nav=document.getElementById('page-nav');
+  nav.innerHTML='';
+  PAGE_DEFS.forEach(function(p,i){
+    var b=document.createElement('button');
+    b.className='pnav-btn'+(i===0?' on':'');
+    b.textContent=p.label;
+    b.setAttribute('onclick','goPage("'+p.id+'",this)');
+    nav.appendChild(b);
+  });
+
+  var con=document.getElementById('pages-container');
+  con.innerHTML='';
+  PAGE_DEFS.forEach(function(p,i){
+    var div=document.createElement('div');
+    div.id=p.id;
+    div.className='page'+(i===0?' on':'');
+    div.innerHTML=genPage(p.id);
+    con.appendChild(div);
+  });
+}
+
+function goPage(id,el){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.pnav-btn').forEach(function(b){b.classList.remove('on');});
+  document.getElementById(id).classList.add('on');
+  el.classList.add('on');
+}
+
+function sec(icon,title,body){
+  return '<div class="sec"><div class="sec-head"><div class="sec-icon">'+icon+'</div>'+title+'</div><div class="sec-body">'+body+'</div></div>';
+}
+
+function genPage(id){
+  var g=G;
+  var html='';
+
+  if(id==='p1'){
+    html+=sec('一','基本資料',
+      '<div class="bnum-row">'+
+      item('生命靈數',g.lp,'g')+
+      item('先天數',g.inn,'j')+
+      item('後天數',g.acq,'j')+
+      item('人格數',g.pers,'j')+
+      item('生日數',g.birth,'j')+
+      item('命運數',g.dest,'j')+
+      '</div>'+
+      '<p><strong>姓名：</strong>'+g.name+'　<strong>性別：</strong>'+(g.gender==='female'?'女性':'男性')+'　<strong>感情狀態：</strong>'+g.status+'</p>'+
+      '<p><strong>生日：</strong>'+g.y+' 年 '+g.m+' 月 '+g.d+' 日</p>'+
+      '<p><strong>生肖：</strong>'+g.zo+'　<strong>星座：</strong>'+g.cons+'</p>'+
+      '<p><strong>解析年度：</strong>'+g.ty+'年　<strong>流年數：</strong>'+g.yf+'（'+YEAR[g.yf].t+'）</p>'
+    );
+  }
+
+  if(id==='p2'){
+    html+=sec('二','九宮格命盤',genPalace(g.counts,g.miss));
+  }
+
+  if(id==='p3'){
+    var body='';
+    // 說明區
+    body+='<div style="background:var(--gold-pale);border:1px solid var(--gold-lt);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:.8rem;line-height:1.9;color:#5a4010;">';
+    body+='<strong>說明：</strong><br>';
+    body+='★★★☆☆ ＝ 此數字出現1次，能量普通，具備基本特質<br>';
+    body+='★★★★☆ ＝ 出現2次（強化數），能量加倍，優缺點都更明顯<br>';
+    body+='★★★★★ ＝ 出現3次以上，能量極強，這個特質主導你的人生<br>';
+    body+='<span style="color:var(--jade)">✦ 強化數</span>標籤代表這個數字出現超過1次，影響力更深，優點更突出、挑戰也更大<br>';
+    body+='缺數請參見「缺數分析」頁面';
+    body+='</div>';
+
+    var hasAny=false;
+    for(var i=1;i<=9;i++){
+      var cnt=g.counts[i];
+      if(cnt===0) continue; // 跳過缺數
+      hasAny=true;
+      var n=NUM[i];
+      var stars=cnt===1?'★★★☆☆':cnt===2?'★★★★☆':'★★★★★';
+      var starColor=cnt>=3?'var(--rust)':cnt>=2?'var(--jade)':'var(--gold)';
+      body+='<div style="border:1px solid var(--border);border-radius:6px;padding:14px 16px;margin-bottom:12px;background:var(--card);">';
+      // Header
+      body+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">';
+      body+='<span style="font-family:\'Noto Serif TC\',serif;font-size:2rem;font-weight:900;color:var(--gold);line-height:1;min-width:32px;">'+i+'</span>';
+      body+='<div>';
+      body+='<div style="font-size:.88rem;font-weight:700;color:var(--jade);margin-bottom:2px;">'+n.label+'</div>';
+      body+='<div style="color:'+starColor+';font-size:1rem;letter-spacing:1px;">'+stars;
+      if(cnt>=2) body+=' <span style="font-size:.72rem;background:var(--jade-lt);color:var(--jade);border:1px solid #a0ccc4;border-radius:3px;padding:1px 7px;margin-left:6px;font-weight:700;">強化數 ×'+cnt+'</span>';
+      body+='</div></div></div>';
+      // 內容
+      if(cnt>=2){
+        // 強化數要特別說明加倍效果
+        body+='<div style="background:var(--jade-lt);border-radius:4px;padding:10px 12px;margin-bottom:10px;font-size:.8rem;color:#2a3d35;line-height:1.8;">';
+        body+='此數字在你的命盤出現 <strong>'+cnt+' 次</strong>，代表這個能量在你身上特別強烈。優點更突出，但挑戰與課題也更明顯，需要有意識地管理。';
+        body+='</div>';
+      }
+      body+='<p style="font-size:.85rem;line-height:1.8;margin-bottom:6px;"><strong>優點：</strong>'+n.good+'</p>';
+      body+='<p style="font-size:.85rem;line-height:1.8;margin-bottom:6px;"><strong>挑戰：</strong>'+n.bad+'</p>';
+      body+='<p style="font-size:.85rem;line-height:1.8;"><strong>建議：</strong>'+n.fix+'</p>';
+      body+='</div>';
+    }
+    if(!hasAny) body+='<p style="color:var(--mist)">命盤數字計算中…</p>';
+    html+=sec('三','數字能量分析',body);
+  }
+
+  if(id==='p4'){
+    var body='';
+    if(g.miss.length===0){
+      body='<p>✦ 1～9 全數具備，命盤能量完整圓滿，各方面天賦均衡發展。</p>';
+    } else {
+      g.miss.forEach(function(n){
+        body+='<div class="conn" style="background:#fff5f3;border-color:#f0c8c0;margin-bottom:12px;">';
+        body+='<div class="conn-t" style="color:var(--rust);">缺 '+n+'｜'+NUM[n].label+'</div>';
+        body+='<div class="conn-d">'+MISS[n]+'</div></div>';
+      });
+    }
+    html+=sec('四','缺數分析',body);
+  }
+
+  if(id==='p5'){
+    var body='';
+    if(g.conns.length===0){
+      body='<p style="color:var(--mist)">命盤目前尚未形成完整連線，各數字能量獨立運作。適合專注於單一核心領域深耕，讓個別數字的特質充分發揮。</p>';
+      var almost=["147","258","369","456","789","123","159","168","357"].filter(function(l){
+        var has=l.split('').filter(function(n){return g.counts[n]>0;}).length;
+        return has===2;
+      });
+      if(almost.length>0){
+        body+='<p style="margin-top:10px;font-size:.82rem;color:var(--mist)"><strong>差一步的連線：</strong>'+almost.join('、')+'（補足缺數即可啟動）</p>';
+      }
+    } else {
+      g.conns.forEach(function(l){
+        var c=CONN[l];
+        if(!c) return;
+        body+='<div class="conn" style="margin-bottom:16px;">';
+        body+='<div class="conn-t">'+l.split('').join(' ─ ')+'　｜　'+c.name+'</div>';
+        body+='<div style="margin-top:10px;">';
+        body+='<div style="font-size:.78rem;font-weight:700;color:var(--jade);margin-bottom:4px;">▌ 這是什麼樣的人</div>';
+        body+='<div class="conn-d">'+c.who+'</div>';
+        body+='<div style="font-size:.78rem;font-weight:700;color:var(--jade);margin-top:10px;margin-bottom:4px;">▌ 人生容易遇到的事</div>';
+        body+='<div class="conn-d">'+c.event+'</div>';
+        body+='<div style="font-size:.78rem;font-weight:700;color:var(--rust);margin-top:10px;margin-bottom:4px;">▌ 建議與功課</div>';
+        body+='<div class="conn-d">'+c.advice+'</div>';
+        body+='</div></div>';
+      });
+    }
+    // 綜合連線建議
+    if(g.conns.length>1){
+      body+='<div style="background:var(--jade-lt);border:1px solid #a0ccc4;border-radius:6px;padding:14px 16px;margin-top:8px;">';
+      body+='<div style="font-size:.82rem;font-weight:700;color:var(--jade);margin-bottom:8px;">綜合連線建議</div>';
+      body+='<div style="font-size:.83rem;line-height:1.9;color:#2a3d35;">你的命盤同時具備 '+g.conns.map(function(l){return CONN[l]?CONN[l].name:l;}).join('、')+'。這些能量加在一起，代表你是一個既有行動力又有深度的人，既能創造又懂得照顧他人。建議你找到一個能同時發揮這幾條線能量的核心事業方向，而不是把自己分散在太多地方。</div>';
+      body+='</div>';
+    }
+    // 連線總覽參考
+    body+='<div style="margin-top:16px;padding:12px;background:var(--gold-pale);border-radius:4px;font-size:.76rem;color:#5a4010;line-height:2;">';
+    body+='<strong>所有連線能量一覽：</strong><br>';
+    Object.keys(CONN).forEach(function(k){
+      var active=g.conns.includes(k);
+      body+='<span style="margin-right:12px;'+(active?'font-weight:700;color:var(--jade)':'')+'">'+k+' '+CONN[k].name+(active?' ✓':'')+'</span>';
+    });
+    body+='</div>';
+    html+=sec('五','連線能量完整分析',body);
+  }
+
+  if(id==='p6'){
+    var n=NUM[g.lp];
+    var body='';
+
+    // 核心主數
+    body+='<div style="text-align:center;padding:16px;background:var(--gold-pale);border-radius:8px;margin-bottom:20px;">';
+    body+='<div style="font-size:.75rem;color:var(--mist);letter-spacing:.1em;margin-bottom:4px;">核心主數</div>';
+    body+='<div style="font-family:\'Noto Serif TC\',serif;font-size:3rem;font-weight:900;color:var(--gold);line-height:1;">'+g.lp+'</div>';
+    body+='<div style="font-size:.9rem;font-weight:700;color:var(--jade);margin-top:4px;">'+n.label+'</div>';
+    body+='</div>';
+
+    // 基本性格
+    body+='<div style="border-left:3px solid var(--gold);padding-left:14px;margin-bottom:18px;">';
+    body+='<p style="font-weight:700;margin-bottom:6px;">你天生的樣子</p>';
+    body+='<p style="font-size:.88rem;line-height:1.9;">'+n.good+'。這讓你在人群中往往是那個推動事情發生的人，或是讓氣氛活絡的那個。</p>';
+    body+='<p style="font-size:.88rem;line-height:1.9;margin-top:6px;">但也因為這樣，'+n.bad+'。這不是缺點，而是你這個能量的另一面。</p>';
+    body+='</div>';
+
+    // 缺數對性格的影響
+    if(g.miss.length>0){
+      body+='<div style="border-left:3px solid var(--rust);padding-left:14px;margin-bottom:18px;">';
+      body+='<p style="font-weight:700;color:var(--rust);margin-bottom:8px;">缺數讓你的性格有這些面向</p>';
+      var missPersonality={
+        1:'你有時候會覺得很難真正相信自己的判斷，需要別人的肯定才能安心。這不代表你不行，而是自信心的建立是你的人生功課。',
+        2:'你外表看起來很能照顧別人，但自己脆弱的時候很難開口說。感情或親密關係中容易付出很多，卻覺得沒被真正接住。',
+        3:'你可能有很多想法，但表達出來的比實際想的少很多。有時候別人不懂你，不是因為你不好，而是你還沒找到最適合自己的表達方式。',
+        4:'計畫能力強，但執行起來容易拖。生活節奏不規律，知道要改但很難真的做到。',
+        5:'情緒容易被外在環境帶著走。感情一波動，工作也跟著亂。你是情感能量型人格——當心穩，整個人的狀態就穩。',
+        6:'對家庭或感情有時候反而顯得疏離，或不知道怎麼表達關心。不是不在乎，是不太知道怎麼做。',
+        7:'行動力強，但有時太快行動，缺少沉澱和反思。遇到瓶頸的時候，靜下來往往比繼續推更有效。',
+        8:'對於錢的感覺很複雜。可能很努力卻存不住，或覺得談錢很俗。這其實是財富意識需要後天建立的信號。',
+        9:'格局大有時候看得見，有時候又很糾結在小事上。你的大愛潛力很高，但需要刻意練習從小處去擴展視野。'
+      };
+      g.miss.forEach(function(m){
+        if(missPersonality[m]){
+          body+='<div style="margin-bottom:10px;">';
+          body+='<span style="font-size:.78rem;font-weight:700;color:var(--rust);">缺'+m+'（'+NUM[m].label+'）的影響：</span>';
+          body+='<p style="font-size:.85rem;line-height:1.85;margin-top:3px;">'+missPersonality[m]+'</p>';
+          body+='</div>';
+        }
+      });
+      body+='</div>';
+    }
+
+    // 強化數對性格的影響
+    var multiNums=Object.keys(g.counts).filter(function(k){return g.counts[k]>=2;});
+    if(multiNums.length>0){
+      body+='<div style="border-left:3px solid var(--jade);padding-left:14px;margin-bottom:18px;">';
+      body+='<p style="font-weight:700;color:var(--jade);margin-bottom:8px;">強化數讓你的性格更突出</p>';
+      var multiPersonality={
+        1:'你對「主導」有強烈的需求，這讓你執行力超強，但在關係中要注意不要讓對方覺得沒有空間。',
+        2:'你的情感敏感度極高，幾乎是一種天賦。但也因此容易過度共情，把別人的問題都扛在自己身上。',
+        3:'你的表達力和創意能量非常旺盛，說話有感染力，學東西快。但注意力容易分散，需要一個主軸。',
+        4:'你的責任感和執行力比別人強很多。但也可能太習慣扛，忘了說出自己的需求。',
+        5:'你的適應力和感知力很強，變化對你來說不是壓力而是刺激。但內心其實渴望一個穩定的錨點。',
+        6:'你的照顧欲和愛人能力非常強，身邊的人都感受得到。只是記得，你也需要被照顧。',
+        7:'你的洞察力和思考深度超出常人，能看見別人看不見的層次。但有時候想太多反而讓自己卡住。',
+        8:'你的成就慾和管理能力都很強，適合帶領別人。但要小心不要讓自己變得太結果導向而失去彈性。',
+        9:'你的理想主義和慈悲心非常強烈，容易讓別人感到被理解和被接納。這是你最大的天賦，好好珍惜。'
+      };
+      multiNums.forEach(function(k){
+        var cnt=g.counts[k];
+        if(multiPersonality[k]){
+          body+='<div style="margin-bottom:10px;">';
+          body+='<span style="font-size:.78rem;font-weight:700;color:var(--jade);">'+k+' 出現'+cnt+'次的影響：</span>';
+          body+='<p style="font-size:.85rem;line-height:1.85;margin-top:3px;">'+multiPersonality[k]+'</p>';
+          body+='</div>';
+        }
+      });
+      body+='</div>';
+    }
+
+    // 連線對性格的加成
+    if(g.conns.length>0){
+      body+='<div style="border-left:3px solid var(--gold);padding-left:14px;margin-bottom:18px;">';
+      body+='<p style="font-weight:700;margin-bottom:8px;">命盤連線讓你多了這些特質</p>';
+      g.conns.forEach(function(l){
+        var c=CONN[l];
+        if(!c) return;
+        body+='<div style="margin-bottom:10px;">';
+        body+='<span style="font-size:.78rem;font-weight:700;color:var(--gold);">'+c.name+'（'+l+'）</span>';
+        body+='<p style="font-size:.85rem;line-height:1.85;margin-top:3px;">'+c.who+'</p>';
+        body+='</div>';
+      });
+      body+='</div>';
+    }
+
+    // 整合總結
+    body+='<div style="background:var(--jade-lt);border-radius:6px;padding:16px;margin-top:4px;">';
+    body+='<p style="font-size:.82rem;font-weight:700;color:var(--jade);margin-bottom:8px;">整合起來，你是這樣的人</p>';
+    var summary='你是一個核心主數'+g.lp+'（'+n.label+'）的人，'+n.good.split('、').slice(0,2).join('與')+'是你天生帶來的能量。';
+    if(g.miss.length){
+      summary+='但因為命盤中缺'+g.miss.join('、')+'的能量，你在'+g.miss.map(function(m){return NUM[m].label.split('‧')[0];}).join('、')+'這些面向上需要後天刻意學習，這也是你這輩子最容易在這些地方碰到課題的原因。';
+    }
+    if(g.conns.length){
+      summary+='加上命盤有'+g.conns.map(function(l){return CONN[l]?CONN[l].name:'';}).join('與')+'，讓你同時具備'+g.conns.map(function(l){return CONN[l]?CONN[l].who.substring(0,20)+'…':'';}).slice(0,1).join('')+'這樣的特質。';
+    }
+    summary+='整體來說，你是一個潛力深厚、有獨特能量的人，只要找到對的方向，會走得很遠。';
+    body+='<p style="font-size:.85rem;line-height:1.95;">'+summary+'</p>';
+    body+='</div>';
+
+    html+=sec('六','性格深度分析',body);
+  }
+
+  if(id==='p7'){
+    // 賺錢模式：主數+強化數+缺數+連線 全部影響
+    var wstyle={
+      1:'你是靠主動開創賺錢的人。等待機會不如創造機會，你的財富往往是自己衝出來的，不是等來的。',
+      2:'你的財運和人際深度綁定。當你讓別人感到被理解和被照顧，財富就跟著來了。合夥或服務業是你的主場。',
+      3:'你靠才華和表達力賺錢。你的嘴巴和創意是最強的變現工具，品牌形象和口碑是你最值錢的資產。',
+      4:'你是穩健積累型。不會一夜暴富，但只要方向對、持續做，財富會越來越厚實。急進反而會讓你亂。',
+      5:'你的財富來自多元嘗試。單一收入來源對你來說是風險，斜槓或多管道才是適合你的模式。但要注意不要太分散。',
+      6:'你靠服務與愛心賺錢。越真心對待客人或合作對象，財源越自然流入。強迫行銷反而效果差。',
+      7:'你的財富來自專業深度。你在某個領域鑽得越深，財富就越容易聚集。知識變現、顧問、技術服務是你的路。',
+      8:'你天生有財富能量，目標感強，執行力旺。主動出擊、敢談錢、敢要求回報，是你財運旺的關鍵。',
+      9:'你的錢往往在付出之後回來。用愛心和理想做事，反而能帶動財源。計較得失太多，財氣反而走。'
+    };
+    var body='';
+    body+='<div style="border-left:3px solid var(--gold);padding-left:14px;margin-bottom:16px;">';
+    body+='<p style="font-weight:700;margin-bottom:6px;">你的賺錢模式（靈數'+g.lp+'）</p>';
+    body+='<p style="font-size:.88rem;line-height:1.9;">'+wstyle[g.lp]+'</p>';
+    // 缺數對財運的影響
+    var wMissEffect=[];
+    if(g.miss.includes(4)) wMissEffect.push('缺4讓你在財務規劃上容易有始無終，收入不穩定時特別明顯。建議從記帳開始，建立最基礎的財務紀律。');
+    if(g.miss.includes(8)) wMissEffect.push('缺8代表對金錢有某種複雜的心理，可能覺得談錢很俗，或賺了錢又不知道怎麼留住。需要刻意建立財富意識。');
+    if(g.miss.includes(1)) wMissEffect.push('缺1讓你在財務上容易等待而不主動出擊，等時機成熟才行動，但財運往往要靠自己去推。');
+    if(g.miss.includes(6)) wMissEffect.push('缺6的人有時候忽略了服務心，若能把客戶關係做好做深，財運會明顯改善。');
+    if(wMissEffect.length>0){
+      body+='<p style="margin-top:10px;font-size:.85rem;font-weight:700;color:var(--rust);">缺數對財運的影響</p>';
+      wMissEffect.forEach(function(w){body+='<p style="font-size:.85rem;line-height:1.85;margin-top:4px;">'+w+'</p>';});
+    }
+    // 強化數加成
+    var multiNums=Object.keys(g.counts).filter(function(k){return g.counts[k]>=2;}).map(Number);
+    if(multiNums.includes(1)) body+='<p style="margin-top:8px;font-size:.85rem;"><strong style="color:var(--jade)">強化數1</strong>：行動力加倍，財富靠主動創造，越行動越有錢，停下來反而能量弱。</p>';
+    if(multiNums.includes(8)) body+='<p style="margin-top:8px;font-size:.85rem;"><strong style="color:var(--jade)">強化數8</strong>：財富能量極強，天生和錢有緣，只要方向對，賺大錢的可能性很高。</p>';
+    if(multiNums.includes(9)) body+='<p style="margin-top:8px;font-size:.85rem;"><strong style="color:var(--jade)">強化數9</strong>：越無私付出，財運越旺。這不是口號，對你來說是真實運作的規律。</p>';
+    body+='</div>';
+    // 連線對財運影響
+    body+='<div style="border-left:3px solid var(--jade);padding-left:14px;margin-bottom:16px;">';
+    body+='<p style="font-weight:700;margin-bottom:6px;">命盤連線財運分析</p>';
+    if(g.conns.includes('168')) body+='<p style="font-size:.85rem;line-height:1.85;">✦ <strong>財富線（168）</strong>：天生帶財，行動力×服務心×成就感三線共鳴，主動出擊時財源最旺，適合以服務換財富的商業模式。</p>';
+    if(g.conns.includes('456')) body+='<p style="font-size:.85rem;line-height:1.85;margin-top:6px;">✦ <strong>組織管理線（456）</strong>：系統化經營能讓你的收入更穩定，建立標準化服務流程或管理制度，可大幅提升獲利。</p>';
+    if(g.conns.includes('147')) body+='<p style="font-size:.85rem;line-height:1.85;margin-top:6px;">✦ <strong>行動力線（147）</strong>：你是主動出擊型，財運跟行動力成正比，動起來就有錢，停下來就乾涸。</p>';
+    if(g.conns.includes('789')) body+='<p style="font-size:.85rem;line-height:1.85;margin-top:6px;">✦ <strong>貴人線（789）</strong>：財富往往靠貴人帶動，人脈轉介紹和口碑推薦是你最強的財源管道。</p>';
+    if(!g.conns.some(function(c){return ['168','456','147','789'].includes(c);})){
+      body+='<p style="font-size:.85rem;line-height:1.85;">目前命盤尚無財運相關連線，建議以靈數'+g.lp+'的核心賺錢模式為主，持續深耕，財運會在積累後逐漸顯現。</p>';
+    }
+    body+='</div>';
+    // 流年財運
+    var wYearTip={1:'今年是播種年，財務上適合投入資源、開啟新收入來源，不宜只守不攻。',2:'今年財運靠合作，與人共事或合夥的收益比單打獨鬥好。',3:'今年靠曝光帶財，社群、口碑、品牌能量強，多讓人看見你。',4:'今年適合建立財務系統、記帳、規劃，基礎打好，後面幾年收益自然來。',5:'今年財運起伏較大，避免大額投資或冒進，多元收入比單一押注更安全。',6:'今年財運與人際掛鉤，維護好現有客戶關係，轉介紹和回頭客是主力。',7:'今年財運偏靜，適合精進專業、學習提升，為明後年的爆發做準備。',8:'今年財運旺，努力有回報，適合談合約、推進重要業務、主動收款。',9:'今年適合清理財務、結算收益、放下不賺錢的項目，為新循環騰出空間。'};
+    body+='<div style="background:var(--gold-pale);border-radius:6px;padding:12px 16px;margin-bottom:12px;">';
+    body+='<p style="font-size:.82rem;font-weight:700;color:var(--gold);margin-bottom:4px;">'+g.ty+'年流年'+g.yf+'（'+YEAR[g.yf].t+'）財運提示</p>';
+    body+='<p style="font-size:.85rem;line-height:1.85;">'+wYearTip[g.yf]+'</p>';
+    // 財運高峰月：找流月為8或1的月份
+    var peakMonths=[];
+    for(var mo=1;mo<=12;mo++){var mf2=monthFlow(g.yf,mo);if(mf2===8||mf2===1||mf2===3) peakMonths.push(mo+'月（流月'+mf2+'）');}
+    if(peakMonths.length) body+='<p style="font-size:.82rem;margin-top:6px;"><strong>財運高峰月：</strong>'+peakMonths.join('、')+'</p>';
+    body+='</div>';
+    body+='<p style="font-size:.75rem;color:var(--mist)">※ 命理角度參考，不作為投資理財決策依據。</p>';
+    html+=sec('七','財運分析',body);
+  }
+
+  if(id==='p8'){
+    var loveStyle={
+      1:{mode:'主動型戀人，你是追求者而不是等待者。感情中習慣主導，有時忘了問對方要什麼。',attract:'需要一個有自己生活、不會黏著你、但能在你需要時穩穩在場的伴侶。',risk:'容易因為太強勢讓對方喘不過氣，或把感情也當成要征服的目標。',grow:'學習在感情中放慢，問問對方的感受，而不只是告訴對方你的決定。'},
+      2:{mode:'你在感情裡付出極深，對方的情緒你都感受得到，有時甚至比對方更清楚對方的需求。',attract:'需要一個懂得珍惜、願意接住你付出的伴侶，而不是理所當然地接受。',risk:'太容易為感情委屈自己，累積到一個點就崩潰，或默默離開。',grow:'學會說出自己的需求，不是只有給，也要讓自己被照顧。'},
+      3:{mode:'你在感情中浪漫、有趣、充滿創意，讓人覺得和你在一起很有活力。',attract:'需要一個欣賞你、給你回應、願意和你一起玩的伴侶，受不了沉悶或不溝通的人。',risk:'情緒起伏較大，有時說話傷人卻沒意識到，或因為新鮮感消退而感情變淡。',grow:'練習在感情中的深度，不只是好玩，也要能面對不好玩的時刻。'},
+      4:{mode:'你是感情中最可靠的那個。重視承諾，一旦決定就很認真。但表達愛意的方式比較含蓄，行動大於言語。',attract:'需要一個懂得你的沉默就是在乎、不需要你每天甜言蜜語的伴侶。',risk:'情感表達太少，對方會覺得你不在乎，或感情逐漸變成習慣而失去溫度。',grow:'刻意練習說出感受，「我愛你」、「謝謝你」、「我需要你」——說出來，比你想的重要。'},
+      5:{mode:'你的感情需要新鮮感和空間，不喜歡被束縛，但同時又非常渴望深度的愛。',attract:'需要一個給你自由、但自己也很有生活的伴侶，互相獨立但深深連結。',risk:'容易因為失去新鮮感而感情降溫，或因為對方給的安全感不夠而逃避。',grow:'學習在一段感情中主動創造新鮮感，而不是等感覺消失了才想辦法。'},
+      6:{mode:'你是給予型的戀人，把照顧對方當成愛的表達方式，容易把對方放在第一位。',attract:'需要一個懂得感謝、願意回饋你、不讓你單方面付出的伴侶。',risk:'太容易為感情犧牲自己，或把照顧對方的責任感和真正的愛混淆。',grow:'問問自己：這段感情裡，你有沒有被好好對待？愛自己，才能真的愛別人。'},
+      7:{mode:'你不容易敞開心扉，需要時間建立信任。但一旦信任了，你是非常深情且忠誠的伴侶。',attract:'需要一個有耐心、不逼迫你、但能在你準備好時接住你的伴侶。靈魂契合比外表條件重要。',risk:'太封閉自己，讓對方覺得你不需要他們，或因為分析太多而錯失好緣分。',grow:'練習在感情中稍微降低防衛，不需要完全確定才行動，有時候勇敢一步，關係就開了。'},
+      8:{mode:'你在感情中也有主導欲，重視對方的能力和成就，不喜歡依賴型的伴侶。',attract:'需要一個有自己目標、在各自領域都有成就、互相尊重而不是誰依附誰的伴侶。',risk:'容易把工作模式帶進感情，把對方也當成需要管理的項目，或因為太忙而忽略感情。',grow:'感情不是業績，不是努力就有結果，有時候放下控制，讓關係自然流動，反而更好。'},
+      9:{mode:'你對感情的期待極深，你在找的不只是伴侶，而是靈魂共鳴的人。一旦認真就全心投入。',attract:'需要一個理解你的理想主義、不覺得你太認真、能和你有深度交流的伴侶。',risk:'因為期待太高，容易失望。或太容易承擔對方的情緒，不知不覺消耗自己。',grow:'學習接受「不完美的愛」也是愛。真實的人有真實的侷限，接受這件事，感情才能走遠。'}
+    };
+    var ls=loveStyle[g.lp];
+    var body='';
+    body+='<div style="background:var(--gold-pale);border-radius:6px;padding:14px;margin-bottom:16px;">';
+    body+='<p style="font-size:.75rem;color:var(--mist);margin-bottom:4px;">感情狀態：'+g.status+'</p>';
+    body+='<p style="font-size:.88rem;line-height:1.9;">'+ls.mode+'</p>';
+    body+='</div>';
+    body+='<div style="border-left:3px solid var(--jade);padding-left:14px;margin-bottom:14px;">';
+    body+='<p style="font-weight:700;margin-bottom:6px;">最適合你的伴侶特質</p>';
+    body+='<p style="font-size:.85rem;line-height:1.85;">'+ls.attract+'</p>';
+    body+='</div>';
+    // 缺數對感情的影響
+    var loveMiss=[];
+    if(g.miss.includes(2)) loveMiss.push('缺2：你外表能照顧別人，但很難讓自己脆弱。感情裡容易悶著不說，對方以為你沒事，其實你已經受傷很深了。練習說出「我需要你」，是你在感情裡最重要的功課。');
+    if(g.miss.includes(5)) loveMiss.push('缺5：感情一波動，整個人的節奏就亂了。工作、心情全部跟著感情起伏。你需要找到一個不依賴感情也能穩住自己的方法，當你內心有錨，感情反而更穩。');
+    if(g.miss.includes(6)) loveMiss.push('缺6：在感情或家庭關係上容易顯得疏離，不是不在乎，是不知道怎麼表達。刻意練習關心的小動作，比如傳一句「你今天怎麼樣」，比你想的更有力量。');
+    if(g.miss.includes(3)) loveMiss.push('缺3：感情裡容易不說清楚，對方猜不透你。把心裡的話說出來，哪怕笨拙，也比沉默讓感情消耗好。');
+    if(loveMiss.length>0){
+      body+='<div style="border-left:3px solid var(--rust);padding-left:14px;margin-bottom:14px;">';
+      body+='<p style="font-weight:700;color:var(--rust);margin-bottom:8px;">缺數對感情的影響</p>';
+      loveMiss.forEach(function(l){body+='<p style="font-size:.85rem;line-height:1.85;margin-bottom:8px;">'+l+'</p>';});
+      body+='</div>';
+    }
+    // 今年感情運
+    body+='<div style="background:var(--gold-pale);border-radius:6px;padding:12px 16px;margin-bottom:12px;">';
+    body+='<p style="font-size:.82rem;font-weight:700;color:var(--gold);margin-bottom:4px;">'+g.ty+'年感情運（流年'+g.yf+'）</p>';
+    if(g.status==='單身'){
+      var singleYearTip={1:'今年能量主動，適合放下等待、主動出擊，不要讓機會從眼前溜走。',2:'今年適合深化關係，與其廣泛認識，不如對一個人認真。',3:'今年社交能量旺，多參加活動、擴展圈子，緣分容易在輕鬆的場合出現。',4:'今年感情不宜急，穩扎穩打，讓緣分自然靠近。',5:'今年變動較大，容易認識到有趣的人，但也容易因為不穩定而發展不順，保持彈性。',6:'今年貴人帶動感情運，透過朋友介紹或現有圈子拓展是最自然的方式。',7:'今年適合往內沉澱，了解自己真正想要什麼樣的伴侶，比盲目認識新對象更重要。',8:'今年感情運旺，主動表達心意效果好，不要因為怕被拒絕而讓機會溜走。',9:'今年適合清理舊感情的殘留，讓自己真正放下，才能迎接新的緣分。'};
+      body+='<p style="font-size:.85rem;line-height:1.85;">'+singleYearTip[g.yf]+'</p>';
+      // 桃花旺月
+      var peachM=[];
+      for(var mo=1;mo<=12;mo++){var mf3=monthFlow(g.yf,mo);if([2,6,3,1].includes(mf3)) peachM.push(mo+'月（流月'+mf3+'）');}
+      if(peachM.length) body+='<p style="font-size:.82rem;margin-top:6px;"><strong>桃花旺月：</strong>'+peachM.slice(0,4).join('、')+'，這幾個月多出門、多參與活動。</p>';
+    } else if(g.status==='已婚'){
+      var marriedTip={1:'今年適合和另一半一起啟動新計畫或目標，共同創造讓感情升溫。',2:'今年婚姻需要耐心，不要因為小事計較，深化溝通比贏得爭論更重要。',3:'今年適合製造驚喜和浪漫，打破日常的平淡，讓婚姻多一點新鮮感。',4:'今年婚姻穩定，適合共同規劃財務、家庭長期目標，一起做決定增加默契。',5:'今年婚姻可能有小波折，保持溝通，不要讓誤解累積，問題小的時候解決比較容易。',6:'今年家庭氛圍好，適合花時間陪伴家人，享受平凡日子裡的溫暖。',7:'今年各自需要一些空間，給對方和自己適當的獨處時間，反而讓感情更深。',8:'今年婚姻能量積極，如果有想要共同投入的事業或計畫，今年是好時機。',9:'今年適合和另一半回顧你們走過的路，感謝彼此，讓感情更有深度。'};
+      body+='<p style="font-size:.85rem;line-height:1.85;">'+marriedTip[g.yf]+'</p>';
+    } else {
+      var datingTip={1:'今年適合讓感情更進一步，如果時機對了，主動推進。',2:'今年重點在深化信任，比起增加約會次數，更重要的是增加心的距離。',3:'今年感情甜蜜，多製造美好的回憶，這段時間的感情體驗會很珍貴。',4:'今年適合談未來、對彼此的期待說清楚，為長期關係打基礎。',5:'今年感情有些不確定性，兩人需要更多溝通，確認彼此方向一致。',6:'今年感情穩定，是考慮更進一步承諾的好時機。',7:'今年各自需要空間成長，不要因為獨立就誤解對方不在乎。',8:'今年如果有共同目標或計畫，一起去做能讓感情更紮實。',9:'今年適合好好盤點這段感情，確認方向，該前進就前進，該放手就放手。'};
+      body+='<p style="font-size:.85rem;line-height:1.85;">'+datingTip[g.yf]+'</p>';
+    }
+    body+='</div>';
+    body+='<div style="border-left:3px solid var(--rust);padding-left:14px;">';
+    body+='<p style="font-weight:700;margin-bottom:6px;">這輩子的感情功課</p>';
+    body+='<p style="font-size:.85rem;line-height:1.85;">'+ls.risk+'</p>';
+    body+='<p style="font-size:.85rem;line-height:1.85;margin-top:6px;">'+ls.grow+'</p>';
+    body+='</div>';
+    body+='<p style="font-size:.75rem;color:var(--mist);margin-top:12px">※ 命理角度參考，不構成感情建議。</p>';
+    html+=sec('八','感情與婚姻',body);
+  }
+
+  if(id==='p9'){
+    // 各靈數對應身體部位 + 詳細說明
+    var hzDetail={
+      1:{part:'心臟、血管、頭部',detail:'靈數1的能量很強，推動力大，但也容易讓心臟和循環系統過度負荷。頭痛、高血壓、心悸是常見的信號，通常出現在壓力過大或長期過度燃燒自己時。'},
+      2:{part:'腸胃、消化系統、皮膚',detail:'靈數2極度敏感，情緒直接反映在腸胃上。壓力大的時候胃不舒服、消化不良、皮膚起狀況，都是身體在說：你情緒積太多了，需要釋放。'},
+      3:{part:'呼吸系統、肺部、喉嚨',detail:'靈數3的表達能量如果被壓抑，最容易積在喉嚨和呼吸道。容易有咳嗽、喉嚨痛、鼻子過敏的問題，或者情緒長期悶著導致呼吸變淺。'},
+      4:{part:'骨骼、脊椎、膝蓋、關節',detail:'靈數4承擔太多，壓力往往積在骨骼和關節上。背痛、肩頸僵硬、膝蓋不適是常見問題。長期姿勢不良或過度勞動需要特別注意。'},
+      5:{part:'神經系統、腎臟、腰部',detail:'靈數5能量分散，神經系統容易過度刺激。失眠、焦慮、腰痠是常見症狀。腎臟也需要注意，多喝水、保持規律作息對你特別重要。'},
+      6:{part:'生殖系統、荷爾蒙、心臟',detail:'靈數6和愛的能量有關，情緒對荷爾蒙影響極大。當感情或家庭關係有壓力時，荷爾蒙最容易失調，月經不順或內分泌問題要特別留意。'},
+      7:{part:'腦神經、睡眠、眼睛',detail:'靈數7想太多，大腦很少真正休息，睡眠品質普遍不佳。用眼過度、偏頭痛、神經疲勞是常見問題。靜心和數位排毒對你的健康特別重要。'},
+      8:{part:'肝臟、膽、血液',detail:'靈數8能量強、壓力也大，肝臟是主要的承壓器官。長期高壓或情緒壓抑容易讓肝臟受影響，眼睛乾澀、容易疲倦、脾氣暴躁都是肝臟在抗議的信號。'},
+      9:{part:'淋巴系統、免疫系統、腳部',detail:'靈數9承擔他人能量，免疫系統是最容易出問題的地方。容易疲倦、免疫力下降、淋巴循環不暢，通常出現在過度付出、沒有休息的時候。'}
+    };
+    var hd=hzDetail[g.lp];
+    var body='';
+    body+='<div style="background:var(--gold-pale);border-radius:6px;padding:14px;margin-bottom:16px;">';
+    body+='<p style="font-size:.8rem;font-weight:700;color:var(--gold);margin-bottom:4px;">重點照顧部位（靈數'+g.lp+'）</p>';
+    body+='<p style="font-size:.88rem;font-weight:700;color:var(--jade);margin-bottom:6px;">'+hd.part+'</p>';
+    body+='<p style="font-size:.85rem;line-height:1.9;">'+hd.detail+'</p>';
+    body+='</div>';
+    // 缺數對健康的影響
+    var hMiss=[];
+    if(g.miss.includes(5)) hMiss.push('缺5：中心點不穩，情緒波動大，自律神經容易失調。情緒穩健是你最重要的健康基礎。');
+    if(g.miss.includes(4)) hMiss.push('缺4：生活作息難以規律，睡眠時間不固定，長期下來體力恢復變慢。建立固定的就寢時間，效果比任何保健品都好。');
+    if(g.miss.includes(7)) hMiss.push('缺7：不容易靜下來，大腦幾乎沒有休息，導致慢性疲勞。每天哪怕只有10分鐘的靜心或不看手機的時間，對你都是很大的修復。');
+    if(g.miss.includes(2)) hMiss.push('缺2：不容易覺察自己的身體信號，往往撐到很累才停下來。練習定期問自己「我現在身體感覺怎麼樣」，提早照顧比撐壞了再修更有效。');
+    if(hMiss.length>0){
+      body+='<div style="border-left:3px solid var(--rust);padding-left:14px;margin-bottom:14px;">';
+      body+='<p style="font-weight:700;color:var(--rust);margin-bottom:8px;">缺數對健康的提醒</p>';
+      hMiss.forEach(function(h){body+='<p style="font-size:.85rem;line-height:1.85;margin-bottom:6px;">'+h+'</p>';});
+      body+='</div>';
+    }
+    // 強化數健康提醒
+    var hMulti=[];
+    var multiH=Object.keys(g.counts).filter(function(k){return g.counts[k]>=2;}).map(Number);
+    if(multiH.includes(1)) hMulti.push('強化數1：能量超強但也超容易過度燃燒，心臟和循環系統是你最需要保護的地方，適時踩煞車。');
+    if(multiH.includes(8)) hMulti.push('強化數8：肝臟和血液系統需要特別照顧，避免長期高壓，定期做健康檢查。');
+    if(multiH.includes(9)) hMulti.push('強化數9：你天生吸收他人能量，需要定期清理，泡澡、接觸大自然或靜心是最好的排毒方式。');
+    if(hMulti.length>0){
+      body+='<div style="border-left:3px solid var(--jade);padding-left:14px;margin-bottom:14px;">';
+      body+='<p style="font-weight:700;color:var(--jade);margin-bottom:8px;">強化數健康提醒</p>';
+      hMulti.forEach(function(h){body+='<p style="font-size:.85rem;line-height:1.85;margin-bottom:6px;">'+h+'</p>';});
+      body+='</div>';
+    }
+    // 今年健康提示
+    var hYearTip={1:'今年能量強，容易過度燃燒，注意不要讓身體長期透支，心臟和血壓要留意。',2:'今年情緒敏感，心理健康特別重要，腸胃是情緒的晴雨表，照顧好情緒就是照顧身體。',3:'今年能量活躍，適合開始一個新的運動習慣，呼吸道注意保暖。',4:'今年壓力可能較大，肩頸和背部需要定期放鬆，不要讓壓力積在身體裡。',5:'今年變動多，神經系統和腎臟需要照顧，多喝水、保持規律作息是關鍵。',6:'今年家庭事務可能增加，注意不要因為照顧別人而忽略自己，荷爾蒙和內分泌要留意。',7:'今年適合深度休息和排毒，睡眠品質是今年健康的重點指標。',8:'今年高壓模式，肝臟是重點保護對象，每週安排一天真正放鬆什麼都不做。',9:'今年適合清理身體的舊毛病，免疫力需要強化，補充足夠的休息和營養。'};
+    body+='<div style="background:var(--jade-lt);border-radius:6px;padding:12px 16px;margin-bottom:12px;">';
+    body+='<p style="font-size:.82rem;font-weight:700;color:var(--jade);margin-bottom:4px;">'+g.ty+'年健康重點（流年'+g.yf+'）</p>';
+    body+='<p style="font-size:.85rem;line-height:1.85;">'+hYearTip[g.yf]+'</p>';
+    body+='</div>';
+    // 養生建議（根據靈數個性化）
+    var hAdvice={
+      1:['避免過度勞累，每天至少安排30分鐘完全放鬆的時間','定期量血壓，注意心臟健康，有氧運動比重訓更適合你','衝動性格容易讓你忽略身體信號，練習在疲憊時主動停下來'],
+      2:['情緒管理是你最重要的健康功課，找到讓自己放鬆的方式','避免空腹時處理情緒性的事情，胃容易因情緒波動','定期和信任的人說說心裡話，比任何保健品都有效'],
+      3:['多唱歌或大聲朗讀，讓喉嚨和肺部的能量流動','避免熬夜說話、唱歌，讓聲帶有足夠的休息','把情緒用創作或表達的方式釋放，比悶在心裡健康'],
+      4:['拉伸和放鬆肌肉比劇烈運動更適合你，瑜珈或太極是好選擇','定期按摩肩頸和脊椎，是你維持健康的基本保養','避免長時間同一個姿勢，每小時起來動一動'],
+      5:['規律作息對你來說比運動還重要，固定時間睡覺和起床','多喝水，每天至少2000ml，腎臟是你需要特別保護的器官','減少過度刺激（咖啡、手機、噪音），讓神經系統有空間休息'],
+      6:['定期做婦科或內分泌相關的健康檢查','避免為了照顧別人而忽略自己的身體需求，自己的健康優先','學習接受他人的照顧，讓愛的能量雙向流動'],
+      7:['睡眠品質是你健康的核心指標，睡前1小時遠離螢幕','每天10分鐘的靜心或冥想，讓大腦真正休息','定期做眼睛保健，護眼和腦神經放鬆同樣重要'],
+      8:['每週安排至少一天不處理工作的完全休息日','護肝是你的年度功課：少喝酒、少熬夜、少生悶氣','適度運動排解壓力，但避免把健身也變成一個需要達標的任務'],
+      9:['定期排毒和清理，泡澡、森林浴或靜心特別適合你','避免吸收太多他人的負能量，學會設立能量界線','免疫力和你的情緒狀態直接掛鉤，保持心情平衡最重要']
+    };
+    body+='<p style="font-weight:700;margin-bottom:8px;">個人化養生建議</p>';
+    hAdvice[g.lp].forEach(function(a,i){body+='<p style="font-size:.85rem;line-height:1.85;">'+['①','②','③'][i]+' '+a+'</p>';});
+    body+='<p style="font-size:.75rem;color:var(--mist);margin-top:12px">※ 命理角度參考，不作為醫療診斷，身體不適請就醫。</p>';
+    html+=sec('九','健康提醒',body);
+  }
+
+  if(id==='p10'){
+    var careerDetail={
+      1:{dir:'創業、主管、開拓型職位',core:'你不是適合在別人底下做事的人，最適合的狀態是做自己的老闆，或在組織裡有足夠的自主空間。你的能量在主導一件事的時候最強。',gift:'你的最大天賦是開創力，能從零到一，在別人還在討論的時候你已經在做了。',risk:'容易因為太獨立而不善於和人合作，或因為目標太多而精力分散。'},
+      2:{dir:'輔導、諮詢、人資、服務業、公關',core:'你最適合需要理解他人、建立關係、橋接溝通的工作。讓別人感到被理解，是你最強的職業武器。',gift:'你的最大天賦是同理心和傾聽能力，能讓人自然地信任你和向你開口。',risk:'容易因為太照顧別人的感受而忽略自己的需求，或在職場上過度付出卻得不到對等的回報。'},
+      3:{dir:'教學、媒體、創作、社群經營、銷售',core:'你的表達能力是你最強的職業工具。不管是說話、寫作還是創作，你都能讓人感受到你的能量。',gift:'你的天賦是讓複雜的事情變得有趣、讓人想聽你說話、讓品牌有溫度。',risk:'容易對太多事感興趣而方向分散，或因為情緒起伏影響工作的穩定性。'},
+      4:{dir:'工程、財務、行政管理、建築、技術',core:'你在需要穩定性、精準度和長期規劃的領域表現最好。你是組織的骨幹，可靠到讓人放心把重要的事交給你。',gift:'你的天賦是執行力和責任感，說了要做的事就會做到，這在職場上是非常稀有的能力。',risk:'有時候太鑽牛角尖，難以接受突然的變化，或因為太求完美而影響效率。'},
+      5:{dir:'業務、旅遊、自由工作者、斜槓創業、行銷',core:'你需要多元刺激，單一重複的工作對你來說是消耗而不是成長。你在需要快速應變、廣泛連結的工作中最有活力。',gift:'你的天賦是適應力和感知力，能快速讀懂市場和人，是天生的業務和行銷人才。',risk:'容易精力分散、難以深耕，或因為生活變動太多而讓工作失去穩定性。'},
+      6:{dir:'醫療、教育、社工、療癒產業、美容養生、服務業',core:'你天生是照顧者，在需要用心對待人的工作裡你最發光。服務業、療癒類、教育類是你能量最對的舞台。',gift:'你的天賦是讓人感到被照顧和被重視，這是很多人學不來的天生氣質。',risk:'容易因為過度付出而燃燒殆盡，或把工作和個人情感混淆，不知道怎麼設立界線。'},
+      7:{dir:'研究、心理、技術、命理、靈性指導、分析',core:'你的強項是深度思考和洞察力，在需要鑽研、分析、或探索本質的工作裡你最有優勢。',gift:'你的天賦是能看見別人看不見的層次，能問到別人沒想到的問題，是天生的研究者和分析師。',risk:'有時候想太多反而影響行動力，或因為太追求完美而難以交付成果。'},
+      8:{dir:'企業管理、金融投資、房地產、業務主管',core:'你有天生的商業嗅覺和管理能力，在需要決策、主導、帶人和管錢的工作裡你最強。',gift:'你的天賦是目標感和執行力的結合，能把大方向拆解成可執行的步驟，同時不失去整體視野。',risk:'容易因為太在意成就而忽略過程，或把工作模式帶進所有關係，讓人覺得壓力大。'},
+      9:{dir:'身心靈、療癒、藝術、靈性指導、教育、公益',core:'你最適合能讓你用智慧和慈悲影響別人的工作。不只是服務，而是真正改變人的生命。',gift:'你的天賦是大格局視野和對人性的深刻理解，能讓別人在你身邊感受到被看見和被懂得。',risk:'容易因為太理想主義而忽略實際面，或因為太照顧別人而忘了建立自己的財務基礎。'}
+    };
+    var cd=careerDetail[g.lp];
+    var body='';
+    body+='<div style="background:var(--gold-pale);border-radius:6px;padding:14px;margin-bottom:16px;">';
+    body+='<p style="font-size:.8rem;color:var(--mist);margin-bottom:4px;">最適合的方向</p>';
+    body+='<p style="font-size:.92rem;font-weight:700;color:var(--jade);">'+cd.dir+'</p>';
+    body+='<p style="font-size:.85rem;line-height:1.9;margin-top:6px;">'+cd.core+'</p>';
+    body+='</div>';
+    body+='<div style="border-left:3px solid var(--jade);padding-left:14px;margin-bottom:14px;">';
+    body+='<p style="font-weight:700;margin-bottom:6px;">你的核心天賦</p>';
+    body+='<p style="font-size:.85rem;line-height:1.85;">'+cd.gift+'</p>';
+    body+='</div>';
+    // 連線對事業的加持
+    if(g.conns.length>0){
+      body+='<div style="border-left:3px solid var(--gold);padding-left:14px;margin-bottom:14px;">';
+      body+='<p style="font-weight:700;margin-bottom:8px;">連線能量加持你的事業</p>';
+      g.conns.forEach(function(l){
+        var c=CONN[l];
+        if(!c) return;
+        body+='<p style="font-size:.85rem;line-height:1.85;margin-bottom:6px;"><strong>'+c.name+'（'+l+'）</strong>：'+c.who+'</p>';
+      });
+      body+='</div>';
+    }
+    // 缺數對事業的影響
+    var cMiss=[];
+    if(g.miss.includes(1)) cMiss.push('缺1：你有能力，但有時候缺乏主動出擊的勇氣，等待機會多於創造機會。練習主動提案、主動聯繫，機會比你想的多。');
+    if(g.miss.includes(4)) cMiss.push('缺4：計畫力強但執行不穩，容易有好的想法卻落地困難。建立SOP或找一個能幫你執行落地的人，是最有效的補足方式。');
+    if(g.miss.includes(8)) cMiss.push('缺8：對財務和商業運作的敏感度較低，需要刻意學習定價、談判和財務管理，這些都是可以後天補強的能力。');
+    if(g.miss.includes(3)) cMiss.push('缺3：表達和行銷能力需要練習，但你的內容和服務品質是很強的，只是讓人知道這件事需要刻意努力。');
+    if(cMiss.length>0){
+      body+='<div style="border-left:3px solid var(--rust);padding-left:14px;margin-bottom:14px;">';
+      body+='<p style="font-weight:700;color:var(--rust);margin-bottom:8px;">缺數對事業的影響</p>';
+      cMiss.forEach(function(c){body+='<p style="font-size:.85rem;line-height:1.85;margin-bottom:6px;">'+c+'</p>';});
+      body+='</div>';
+    }
+    // 今年事業運
+    var cYearTip={1:'今年是開創年，最適合啟動新計畫、開發新客源或嘗試新方向，行動力是今年最大的資本。',2:'今年靠合作突破，與他人建立深度合作關係，一個好的夥伴今年勝過十倍的努力。',3:'今年品牌和曝光是重點，讓更多人看見你，社群、口碑、內容都要動起來。',4:'今年適合深耕現有業務，把服務和流程做得更好，紮實的一年為後面幾年打基礎。',5:'今年機會多但也容易分心，聚焦在最重要的一件事，不要貪多。',6:'今年靠人際帶動事業，維護好現有客戶和關係，轉介紹是今年最強的業績來源。',7:'今年適合精進技術和專業，讓自己在某個領域更有深度，明後年的爆發從今年的積累開始。',8:'今年事業運旺，主動出擊效果好，適合談大客戶、推進重要合作或擴大規模。',9:'今年適合收尾和整合，清理不適合的合作或方向，為下一個新循環做準備。'};
+    body+='<div style="background:var(--jade-lt);border-radius:6px;padding:12px 16px;margin-bottom:12px;">';
+    body+='<p style="font-size:.82rem;font-weight:700;color:var(--jade);margin-bottom:4px;">'+g.ty+'年事業運（流年'+g.yf+'）</p>';
+    body+='<p style="font-size:.85rem;line-height:1.85;">'+cYearTip[g.yf]+'</p>';
+    body+='</div>';
+    body+='<div style="border-left:3px solid var(--rust);padding-left:14px;">';
+    body+='<p style="font-weight:700;margin-bottom:6px;">事業上的挑戰和功課</p>';
+    body+='<p style="font-size:.85rem;line-height:1.85;">'+cd.risk+'</p>';
+    body+='<p style="font-size:.85rem;line-height:1.85;margin-top:6px;">'+NUM[g.lp].fix+'</p>';
+    body+='</div>';
+    html+=sec('十','事業與天賦',body);
+  }
+
+  if(id==='p13'){
+    var yr=YEAR[g.yf];
+    var body='<div style="text-align:center;padding:20px;background:var(--gold-pale);border-radius:8px;margin-bottom:20px;">';
+    body+='<div style="font-size:.75rem;color:var(--mist);margin-bottom:4px;">'+g.ty+' 流年數</div>';
+    body+='<div style="font-family:\'Noto Serif TC\',serif;font-size:3.5rem;font-weight:900;color:var(--gold);line-height:1;">'+g.yf+'</div>';
+    body+='<div style="font-size:.9rem;font-weight:700;color:var(--jade);margin-top:6px;">'+yr.t+'</div>';
+    body+='<div style="font-size:.82rem;color:var(--mist);margin-top:4px;">生命靈數'+g.lp+'×流年'+g.yf+' 的能量組合</div>';
+    body+='</div>';
+    body+='<p style="font-size:.88rem;line-height:1.9;margin-bottom:14px;">'+yr.d+'</p>';
+    // 根據靈數+流年組合給個人化今年分析
+    var lpYearCombo={
+      // 靈數1
+      '1-1':'你的開創能量遇上播種年，是最強的起點。今年你啟動的任何事，未來九年都會影響你。不要怕失敗，大膽種下種子。',
+      '1-4':'你的行動力遇上建構年，今年最適合把過去分散的能量整合成一個系統。建立制度、打造流程，讓你的能力有可複製的結構。',
+      '1-7':'你的外在推進力遇上內省年，今年可能會感到能量變慢，但這是在積累智慧。不要強行推進，今年學到的東西明年會成為你最強的武器。',
+      '1-8':'行動力遇上收穫年，今年是你見到成果的時候。過去幾年的努力，今年開始有了明確的回報，主動出擊，把握每個機會。',
+      // 靈數7
+      '7-1':'你的深度思考能量遇上播種年，今年適合把你長期研究的東西開始落地成真。第一步不用完美，出發比等待更重要。',
+      '7-7':'雙7共鳴，今年你的靈性和洞察能量到達頂峰。適合做系統性的學習、研究或靈性探索，這一年積累的智慧可能是一生中最深刻的。',
+      '7-8':'你的深度遇上收穫年，今年你的專業和知識最容易被看見和肯定。把你懂的東西展示出來，讓更多人知道你的價值。',
+      '7-9':'你的靈性能量遇上結束年，今年適合放下過去的某些信念或包袱，讓自己輕裝前進。清理之後，明年才能以新的樣子出發。'
+    };
+    var comboKey=g.lp+'-'+g.yf;
+    var comboText=lpYearCombo[comboKey]||'你的靈數'+g.lp+'能量在流年'+g.yf+'（'+yr.t+'）的加乘下，'+([1,3,5,8].includes(g.yf)?'今年整體能量積極，適合主動出擊，有行動就有成果。':'今年能量偏向內修和深化，沉下來做好一件事，比跑很多地方更有收穫。');
+    body+='<div style="border-left:3px solid var(--jade);padding-left:14px;margin-bottom:16px;">';
+    body+='<p style="font-weight:700;margin-bottom:6px;">靈數'+g.lp+'×流年'+g.yf+' 的個人解讀</p>';
+    body+='<p style="font-size:.85rem;line-height:1.9;">'+comboText+'</p>';
+    body+='</div>';
+    // 四個面向今年分析
+    var yearFocus=[
+      {label:'事業',icon:'💼',text:([1,3,5,8].includes(g.yf)?'今年適合積極推進，啟動新計畫或拓展業務版圖。行動是今年事業最大的關鍵字。':'今年宜深耕現有業務，把服務品質和客戶關係做得更好，為後面幾年打基礎。')},
+      {label:'感情',icon:'💛',text:([1,3,6].includes(g.yf)?'今年感情能量活躍，單身的你適合主動擴展社交圈；有伴侶的你適合製造新的共同記憶。':g.status==='已婚'?'今年婚姻重點在溝通和理解，給彼此更多空間，感情反而會更深。':'今年感情宜穩定，重質不重量，深化而非拓展。')},
+      {label:'財運',icon:'💰',text:([1,3,5,8].includes(g.yf)?'今年財運積極，主動開拓新收入來源，有行動有收穫。':'今年財運偏穩健，不宜大額投資或冒進，守住現有收益，規劃未來。')},
+      {label:'健康',icon:'🌿',text:([5,8,1].includes(g.yf)?'今年能量強但消耗也大，注意不要過度燃燒，適時休息比繼續推更重要。':[2,4,7].includes(g.yf)?'今年情緒和壓力對身體的影響較大，照顧好心理健康就是照顧身體。':'今年整體健康能量穩定，維持規律作息和運動習慣即可。')}
+    ];
+    body+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">';
+    yearFocus.forEach(function(yf2){
+      body+='<div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px;">';
+      body+='<p style="font-size:.82rem;font-weight:700;color:var(--jade);margin-bottom:4px;">'+yf2.icon+' '+yf2.label+'</p>';
+      body+='<p style="font-size:.8rem;line-height:1.7;">'+yf2.text+'</p>';
+      body+='</div>';
+    });
+    body+='</div>';
+    body+='<div style="background:var(--jade-lt);border-radius:6px;padding:12px 16px;">';
+    body+='<p style="font-size:.82rem;font-weight:700;color:var(--jade);margin-bottom:6px;">'+g.ty+'年最重要的一件事</p>';
+    var mostImportant={1:'勇敢跨出第一步，不要等到準備好才開始。',2:'耐心等待，深化現有的關係和資源。',3:'讓更多人看見你，曝光是今年最大的槓桿。',4:'把重要的事情系統化，讓努力可以複製。',5:'擁抱變化，不要執著於原本的計畫，靈活應對才能抓住機會。',6:'照顧好最重要的關係，家人或長期客戶是今年的重點。',7:'靜下來學一件真正深的事，今年積累的智慧會在未來幾年發光。',8:'主動出擊，把握每個談合作、談收益的機會，今年行動有回報。',9:'清理和放下，讓不適合的人事物離開，為下一個循環騰出空間。'};
+    body+='<p style="font-size:.88rem;line-height:1.85;font-weight:700;color:var(--ink);">'+mostImportant[g.yf]+'</p>';
+    body+='</div>';
+    html+=sec('十三','流年 '+g.ty,body);
+  }
+
+  if(id==='p11'){
+    var earlyAge=g.lp<=3?'約0～28歲':g.lp<=6?'約0～25歲':'約0～30歲';
+    var midAge=g.lp<=3?'約29～45歲':g.lp<=6?'約26～42歲':'約31～48歲';
+    var lateAge=g.lp<=3?'約46歲以後':g.lp<=6?'約43歲以後':'約49歲以後';
+
+    var earlyDesc={
+      1:'早年是建立自信與方向的階段。你可能從小就比同齡人獨立，但也因此在人際關係上容易格格不入。這段時間最重要的是找到你的核心熱情，不要因為別人的眼光而迷失方向。',
+      2:'早年容易在情感與歸屬感上感到不安全。可能有過一段需要特別在乎別人感受、卻委屈自己的時期。這段時間的功課是建立內在安全感，而不是從外部關係中找答案。',
+      3:'早年是充滿想像力與嘗試的階段，什麼都想學、什麼都想試。但也容易因為太分散而感到迷茫。這段時間的功課是找到自己真正的表達方式。',
+      4:'早年可能承擔了比同齡人更多的責任，或家庭環境給了你很多壓力。你比別人更早懂事，但也因此失去了一些輕鬆探索的機會。',
+      5:'早年充滿變動，可能搬家、換學校、或家庭有變故。這讓你很早就學會了適應，但也讓你渴望穩定。',
+      6:'早年深受家庭影響，可能是家中付出最多的那個孩子，或者很早就學會了照顧別人。這段時間的功課是找到愛自己的方式。',
+      7:'早年可能比同齡人更內向、更有自己的世界。容易被誤解，但其實你只是需要更多時間思考和消化。',
+      8:'早年充滿野心與目標，非常清楚自己想要什麼。但也因為太在意結果，容易在失敗時對自己很嚴苛。',
+      9:'早年是理想主義的階段，對世界充滿期待，但也容易因為現實與期待的落差而感到失落。這段時間的功課是學習接受不完美。'
+    };
+    var midDesc={
+      1:'中年是你開始真正展現領導力的時期。事業上有機會主導重要項目或獨立創業。感情上需要學習在強勢之外展現柔軟。這段時間要特別注意不要讓工作完全取代了情感生活。',
+      2:'中年是你建立深厚人際網絡的黃金期。事業上靠合作與溝通取得突破。感情上容易遇到重要的感情，但也要注意不要為感情犧牲自己的成長。財務上開始趨於穩定，但需要建立更清晰的財務規劃。',
+      3:'中年是你創意能量最旺盛的時期。如果找到了對的方向，這段時間的成果會讓人刮目相看。感情上需要找到能欣賞你、給你回應的伴侶。事業上適合做任何需要表達與溝通的工作。',
+      4:'中年是你建立穩固基礎的關鍵期。事業上適合深耕一個領域，打造屬於自己的系統。財務上開始有能力做中長期的財務規劃。家庭責任可能加重，需要在工作與家庭之間找到平衡。',
+      5:'中年是你人生最多變化的階段。可能會有重大的職業轉換或人生方向的重新定位。感情上也可能有轉折。這段時間最重要的是保持彈性，不要執著於原本的計畫。',
+      6:'中年是你在家庭與社群中發揮影響力的時期。事業上適合做任何與照顧、服務相關的工作。感情上可能面臨家庭責任與個人需求之間的拉扯。需要學習在給予的同時也接受。',
+      7:'中年是你深化專業與智慧的時期。如果選擇了一個你真正熱愛的領域，這段時間的積累會讓你成為該領域的專家。感情上需要找到能和你有深度交流的伴侶。',
+      8:'中年是你財富與成就能量最強的時期。事業上有機會到達重要的位置。財務上如果做了好的規劃，這段時間開始看到成果。但要小心不要為了成就而忽略了健康與家庭。',
+      9:'中年是你智慧與影響力開始擴展的時期。可能開始在社群或某個領域中有了更大的影響力。感情上對另一半的要求可能比年輕時更高，需要真正的靈魂契合。'
+    };
+    var lateDesc={
+      1:'晚年的你，不再需要用行動來證明自己。這是一段享受過去耕耘成果的時期。如果年輕時建立了好的事業或人際基礎，晚年往往能過得很自在。健康上需要特別注意不要過度勞累，學會放慢腳步。',
+      2:'晚年是你人際關係最豐盛的時期。過去播下的善意種子，這時候開始收穫。家庭關係在這個階段通常趨於和諧，是享受天倫之樂的好時機。',
+      3:'晚年的你，創意能量不減反增。很多靈數3的人在退休後才真正找到自己最想做的事。這段時間適合去做年輕時因為現實限制而沒辦法做的事。',
+      4:'晚年的你，過去的努力與紀律開始帶來穩定的回報。財務上如果有好的規劃，晚年生活相對安穩。但要小心不要讓過去的勞碌習慣讓自己在應該休息的時候還停不下來。',
+      5:'晚年的你終於找到了那個一直在尋找的平衡點。比起年輕時的漂泊，這個階段更多了一份沉穩與從容。旅行與探索依然是你的樂趣，但不再是為了逃避，而是真正的享受。',
+      6:'晚年是你最被愛與被感謝的時期。過去那麼多的付出，在這個階段開始以不同的形式回來。家庭關係是你最重要的支柱，好好珍惜。',
+      7:'晚年的你，智慧與靈性能量達到頂峰。可能成為別人的精神導師或智慧來源。健康上需要特別注意睡眠品質與神經系統的調養。',
+      8:'晚年的你，如果前半生努力耕耘，這時候開始享受財務上的豐盛。但要學會把財富用在有意義的事情上，而不只是累積數字。給予比擁有更讓你感到滿足。',
+      9:'晚年是靈數9人生最圓滿的時期。過去的付出、理想與犧牲，在這個階段都有了意義。你可能成為某個社群或家庭中重要的精神支柱，你的智慧與慈悲是你最大的財富。'
+    };
+
+    var relNote={
+      1:'感情上：你的強勢有時會讓另一半覺得喘不過氣。學習在愛情中展現柔軟，是一輩子的功課。兄弟朋友間：你是那個可以依靠的人，但也要注意不要讓別人的問題全壓在你身上。',
+      2:'感情上：你付出很多，但容易得不到等值的回應，需要學會挑選值得你付出的人。朋友間：你是最好的傾聽者，但也要找到能傾聽你的朋友。',
+      3:'感情上：你需要能欣賞你、給你回應的伴侶，找到頻率相同的人很重要。父母朋友間：你是那個活絡氣氛的人，記得也給自己安靜下來的空間。',
+      4:'感情上：你重視承諾與穩定，但有時情感表達太含蓄，要刻意練習說出感受。父母關係：你可能是家中最懂事的那個，記得你也需要被照顧。',
+      5:'感情上：你渴望自由，但也渴望被愛，這兩件事需要找到平衡。朋友間：你人緣好，但深交的朋友可能不多，值得刻意培養幾段深厚的友誼。',
+      6:'感情上：你是給予型的愛人，但要記得愛自己和愛別人同樣重要。父母關係：你很可能是家中的照顧者，要注意不要讓這個角色讓你筋疲力竭。',
+      7:'感情上：你不容易敞開心扉，但一旦信任就非常深情。需要找到有耐心等你打開的伴侶。朋友間：你的朋友不多但都是真心的，這比廣泛的人脈更珍貴。',
+      8:'感情上：你在愛情中也有主導欲，要注意不要把工作模式帶進感情。兄弟間：可能有財務方面的摩擦，清楚的界線是維護關係的關鍵。',
+      9:'感情上：你對感情認真且深入，一旦愛了就很難抽身，需要學習設立健康的情感界線。朋友間：你是那個大家都喜歡找的人，但要注意不要承擔超過自己能力範圍的情緒。'
+    };
+
+    var body='';
+    body+='<div style="border-left:3px solid var(--gold);padding-left:14px;margin-bottom:20px;">';
+    body+='<p style="font-size:.88rem;font-weight:700;color:var(--gold);margin-bottom:6px;">核心課題</p>';
+    body+='<p>'+([9,6,2].includes(g.lp)?'太容易把自己的價值建立在被需要上。你需要學習：即使沒有人需要你，你依然有價值。':[1,8,4].includes(g.lp)?'太在意成就與結果，忘了享受過程。你需要學習：過程本身就是生命的意義。':'太容易把自己的情緒壓下去，假裝沒事。你需要學習：脆弱不是軟弱，而是真實。')+'</p>';
+    if(g.miss.length){
+      body+='<p style="margin-top:8px">缺數提示：你命盤中缺 '+g.miss.join('、')+' 的能量，這些是你這輩子需要有意識去培養的能力，同時也是你最常在人生中遇到課題的面向。</p>';
+    }
+    body+='</div>';
+
+    // Early
+    body+='<div style="border-left:3px solid var(--jade);padding-left:14px;margin-bottom:16px;">';
+    body+='<p style="font-size:.88rem;font-weight:700;color:var(--jade);margin-bottom:6px;">早年 '+earlyAge+'</p>';
+    body+='<p>'+earlyDesc[g.lp]+'</p>';
+    body+='<p style="margin-top:8px;font-size:.82rem;color:var(--mist)">'+relNote[g.lp]+'</p>';
+    body+='</div>';
+
+    // Mid
+    body+='<div style="border-left:3px solid var(--gold);padding-left:14px;margin-bottom:16px;">';
+    body+='<p style="font-size:.88rem;font-weight:700;color:var(--gold);margin-bottom:6px;">中年 '+midAge+'</p>';
+    body+='<p>'+midDesc[g.lp]+'</p>';
+    var invNote='投資與財務：'+([1,3,5,8].includes(g.lp)?'中年是你財務能量上升期，適合做中長期投資規劃，但要避免過於冒進。':'中年財務趨於穩定，適合穩健理財，建立被動收入。');
+    body+='<p style="margin-top:8px;font-size:.82rem;color:var(--mist)">'+invNote+'</p>';
+    body+='</div>';
+
+    // Late
+    body+='<div style="border-left:3px solid var(--rust);padding-left:14px;margin-bottom:16px;">';
+    body+='<p style="font-size:.88rem;font-weight:700;color:var(--rust);margin-bottom:6px;">晚年 '+lateAge+'</p>';
+    body+='<p>'+lateDesc[g.lp]+'</p>';
+    body+='</div>';
+
+    // Summary
+    body+='<div style="background:var(--jade-lt);border-radius:6px;padding:14px 16px;margin-top:8px;">';
+    body+='<p style="font-size:.82rem;font-weight:700;color:var(--jade);margin-bottom:8px;">這輩子要學會的三件事</p>';
+    body+='<p>① '+NUM[g.lp].fix+'</p>';
+    body+='<p>② '+(g.miss.length?'有意識培養缺'+g.miss.join('、')+' 的能量，把人生功課變成人生優勢':'善用命盤完整的能量，每個數字都是你的資源')+'</p>';
+    body+='<p>③ '+([9,6,2].includes(g.lp)?'學會先愛自己，你的能量才能長期穩定地付出給別人':[1,8].includes(g.lp)?'在成就之外找到真正的生命意義，讓成功有溫度':'在行動與沉澱之間找到自己的節奏，動靜皆宜才能走得長遠')+'</p>';
+    body+='</div>';
+
+    html+=sec('十一','人生課題與命運走勢',body);
+  }
+
+  if(id==='p12'){
+    var gifts=[
+      {n:NUM[g.lp].job.split('、')[0],s:5},
+      {n:g.conns.length?CONN[g.conns[0]].name.split('（')[0]:'洞察',s:5},
+      {n:'溝通與人際',s:g.miss.includes(2)?3:4},
+      {n:'創意表達',s:g.counts[3]>=1?4:3},
+      {n:'領導管理',s:g.conns.includes('456')||g.conns.includes('147')?5:3},
+      {n:'靈性療癒',s:[7,9,6].includes(g.lp)||g.conns.includes('369')?5:3},
+      {n:'財務規劃',s:[4,8].includes(g.lp)||g.conns.includes('168')?4:3},
+      {n:'學習研究',s:g.conns.includes('369')?5:[7,3].includes(g.lp)?4:3}
+    ];
+    gifts.sort(function(a,b){return b.s-a.s;});
+    var body='';
+    gifts.slice(0,6).forEach(function(gf){
+      var stars='';
+      for(var i=0;i<5;i++) stars+=(i<gf.s?'⭐':'☆');
+      body+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><span style="width:80px;font-size:.85rem;font-weight:700;">'+gf.n+'</span><span style="font-size:1rem;letter-spacing:2px;">'+stars+'</span></div>';
+    });
+    html+=sec('十二','天賦排行榜',body);
+  }
+
+  if(id==='p13'){
+    var yr=YEAR[g.yf];
+    var body='<div style="text-align:center;margin-bottom:16px;">';
+    body+='<div style="font-size:.75rem;color:var(--mist);margin-bottom:4px;">'+g.ty+' 流年數</div>';
+    body+='<div style="font-family:\'Noto Serif TC\',serif;font-size:3.5rem;font-weight:900;color:var(--gold);line-height:1;">'+g.yf+'</div>';
+    body+='<div style="font-size:.9rem;font-weight:700;color:var(--jade);margin-top:4px;">'+yr.t+'</div></div>';
+    body+='<p>'+yr.d+'</p>';
+    body+='<p style="margin-top:10px"><strong>今年的核心行動方向：</strong></p>';
+    body+='<p>'+([1,5,8].includes(g.yf)?'主動出擊，不要等待時機，機會要自己創造。':[3,6,9].includes(g.yf)?'深化關係與表達，連結是今年最大的財富。':'沉澱精進，把根扎深，厚積才能薄發。')+'</p>';
+    body+='<p style="margin-top:10px"><strong>工作：</strong>'+([1,3,5,8].includes(g.yf)?'積極進攻，有機會拓展版圖':'鞏固現有，培養深度')+'</p>';
+    body+='<p><strong>感情：</strong>'+([1,3,6].includes(g.yf)?'桃花較旺，主動社交有機會':'感情宜穩定，重質不重量')+'</p>';
+    body+='<p><strong>財運：</strong>'+([1,3,5,8].includes(g.yf)?'財運積極，可布局新收入來源':'守成為主，避免大額投資')+'</p>';
+    body+='<p><strong>健康：</strong>'+([5,8,1].includes(g.yf)?'注意過勞，適時休息':'能量較穩，維持規律即可')+'</p>';
+    html+=sec('十三','流年 '+g.ty,body);
+  }
+
+  if(id==='p14'){
+    // 每個流月數的好事與注意
+    var MONTH_GOOD={
+      1:'新計畫啟動順利，有機會認識新的合作夥伴，行動力強的月份，主動出擊效果好',
+      2:'人際關係和諧，溝通順暢，感情有進展的好時機，合作提案容易得到正面回應',
+      3:'創意能量旺盛，適合做品牌曝光、社群發文、學習新技能，人脈拓展效果好',
+      4:'執行力強，計畫推進順利，財務規劃落實的好月份，踏實努力有明顯成果',
+      5:'機遇突然出現，變化帶來好消息，旅行或新嘗試容易有意外收穫',
+      6:'家庭關係和諧，感情甜蜜，服務業業績好，口碑推薦增加，貴人來自女性',
+      7:'直覺準確，研究或深度學習有收穫，靜心後做出的決策往往正確',
+      8:'財運旺，業績有機會突破，談判或合約簽訂順利，努力看到具體回報',
+      9:'人際關係圓滿，適合整理與總結，舊緣分重逢，感謝與回饋帶來好能量'
+    };
+    var MONTH_WARN={
+      1:'過於衝動，容易忽略細節，與人溝通時要注意語氣不要太強硬',
+      2:'情緒敏感，容易想太多，避免因小事影響心情，不宜做重大決定',
+      3:'容易分心，說多做少，避免承諾太多卻無法兌現，財務上小心衝動消費',
+      4:'壓力較大，容易鑽牛角尖，不宜過於固執，要適時放鬆',
+      5:'變動較大，口舌是非較多，避免衝動決定，感情容易有波折',
+      6:'付出過多容易疲憊，避免替別人做太多決定，財務上注意大額支出',
+      7:'容易過度思慮，難以做決定，避免鑽牛角尖，不宜太封閉自己',
+      8:'壓力大，容易因錢或工作起爭執，健康要注意不要過勞，脾氣控制',
+      9:'容易感傷或放不下，避免拖延，做好結束與交接，不要讓舊事耗能'
+    };
+
+    var body='';
+    body+='<div style="background:var(--gold-pale);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:.85rem;line-height:1.8;">';
+    body+='<strong>流年 '+g.yf+'（'+YEAR[g.yf].t+'）</strong>｜'+g.ty+'年整體走勢<br>'+YEAR[g.yf].d;
+    body+='</div>';
+
+    for(var mo=1;mo<=12;mo++){
+      var mf=monthFlow(g.yf,mo);
+      var isGood=[1,3,6,8].includes(mf);
+      var bgCol=isGood?'#f0faf5':'#fff8f5';
+      var borderCol=isGood?'#a0ccc4':'#f0c8c0';
+      body+='<div style="border:1px solid '+borderCol+';border-radius:6px;padding:14px 16px;margin-bottom:10px;background:'+bgCol+';">';
+      body+='<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:8px;">';
+      body+='<span style="font-family:\'Noto Serif TC\',serif;font-size:1.1rem;font-weight:700;color:var(--gold);">'+mo+'月</span>';
+      body+='<span style="font-family:\'Noto Serif TC\',serif;font-size:1.5rem;font-weight:900;color:'+(isGood?'var(--jade)':'var(--rust)')+';">'+mf+'</span>';
+      body+='<span style="font-size:.82rem;font-weight:700;color:'+(isGood?'var(--jade)':'var(--rust)')+';">'+NUM[mf].label+'</span>';
+      body+='<span style="font-size:.75rem;color:var(--mist);margin-left:auto;">'+(isGood?'✦ 好運月':'⚠ 留意月')+'</span>';
+      body+='</div>';
+      body+='<div style="font-size:.82rem;line-height:1.8;">';
+      body+='<span style="color:var(--jade);font-weight:700;">好事：</span>'+MONTH_GOOD[mf]+'<br>';
+      body+='<span style="color:var(--rust);font-weight:700;">注意：</span>'+MONTH_WARN[mf];
+      body+='</div></div>';
+    }
+    html+=sec('十四','流月詳解｜'+g.ty+'年每月運勢',body);
+  }
+
+  if(id==='p15'){
+    var connNames=g.conns.length?g.conns.map(function(c){return CONN[c].name;}).join('、'):'';
+    var body='<p>你的 '+g.ty+' 年，最大的重點是——</p>';
+    body+='<p style="margin-top:8px;font-family:\'Noto Serif TC\',serif;font-size:1rem;font-weight:700;color:var(--jade);">'+YEAR[g.yf].t+'</p>';
+    body+='<p style="margin-top:8px">'+YEAR[g.yf].d+'</p>';
+    body+='<p style="margin-top:12px"><strong>你的優勢：</strong></p>';
+    body+='<p>'+NUM[g.lp].good+(connNames?'。命盤連線能量加持：'+connNames:'')+'</p>';
+    body+='<p style="margin-top:10px"><strong>你的弱點：</strong></p>';
+    body+='<p>'+NUM[g.lp].bad+(g.miss.length?'。需有意識培養缺數'+g.miss.join('、')+'的能量':'')+'</p>';
+    body+='<p style="margin-top:10px"><strong>今年最值得做的三件事：</strong></p>';
+    body+='<p>① '+([1,5,8].includes(g.yf)?'主動拓展，播下新種子，不要等完美才出發':'沉澱與精進，把現有的做深做好')+'</p>';
+    body+='<p>② 善用自己的天賦：'+(NUM[g.lp].job.split('、')[0]||'')+(NUM[g.lp].job.split('、')[1]?'、'+NUM[g.lp].job.split('、')[1]:'')+'</p>';
+    body+='<p>③ '+NUM[g.lp].fix+'</p>';
+    html+=sec('十五','AI 總結', body);
+  }
+
+  if(id==='p16'){
+    // 元辰宮場景：根據生命靈數決定主景
+    var sceneMap={
+      1:{place:'山頂上的石造宮殿',atmo:'開闊、有風、視野極好。站在這裡，你能看見所有人看不到的遠方。',color:'深藍與石灰色'},
+      2:{place:'湖畔的竹林小屋',atmo:'靜謐、有水聲、空氣裡帶著一點濕潤。這裡讓人放鬆，但也讓人想留下來不走。',color:'淺綠與湖藍'},
+      3:{place:'花園中的玻璃溫室',atmo:'明亮、充滿色彩、到處是盛開的花。走進來，你會忍不住微笑。',color:'橙金與嫩綠'},
+      4:{place:'森林深處的木造莊園',atmo:'穩重、踏實、四周都是百年老樹。這裡的空氣讓人覺得安心，一切都會好。',color:'深棕與墨綠'},
+      5:{place:'海邊的白色燈塔',atmo:'有風、有浪聲、光線充足。在這裡，你能感受到自由，也能看見方向。',color:'白色與海藍'},
+      6:{place:'山谷裡的玫瑰莊園',atmo:'溫暖、香氣瀰漫、充滿愛的能量。走進來，你會感受到被照顧的感覺。',color:'玫瑰粉與金黃'},
+      7:{place:'雲端上的水晶宮殿',atmo:'靜謐、純淨、有一種超脫塵世的氛圍。這裡的每一顆水晶，都映照著你最深的內心。',color:'透明與紫色'},
+      8:{place:'城市中心的黃金塔樓',atmo:'氣勢磅礴、能量強烈、每一個角落都充滿成就的氣息。',color:'黑金與深紅'},
+      9:{place:'星空下的古老神殿',atmo:'深邃、神秘、帶著智慧與慈悲的能量。這裡像是整個宇宙的縮影，靜靜守護著你。',color:'深藍與銀白'}
+    };
+    var sc=sceneMap[g.lp];
+
+    // 財庫根據命盤
+    var caiku;
+    if(g.conns.includes('168')) caiku='財庫寬敞明亮，財富能量強，主動出擊時財源自然流入，適合以服務換財富的模式。';
+    else if([4,8].includes(g.lp)) caiku='財庫在正殿，需要用規劃和紀律來守護，穩健積累是你的財富之道。';
+    else if(g.miss.includes(8)) caiku='財庫在後院，需要有意識地建立財富意識，把賺錢當成一門學問來學。';
+    else caiku='財庫位置穩固，靠口碑與信任慢慢累積，後運財富往往比前半生豐盛。';
+
+    // 桃花根據命盤
+    var taohua;
+    if(g.status==='已婚') taohua='感情宮位穩固，婚姻能量持續，維護好眼前的緣分比追求新的更重要。';
+    else if([2,6,9].includes(g.lp)) taohua='桃花能量強，容易吸引人，但也容易遇到靈魂相近卻現實條件複雜的緣分，需要謹慎辨別。';
+    else if(g.miss.includes(2)||g.miss.includes(6)) taohua='桃花來得慢，但一旦認真了就很深。不要急，你的緣分是需要沉澱的那種。';
+    else taohua='桃花不算旺，但緣分出現時往往是真心的。與其廣撒網，不如在深度上用心。';
+
+    // 健康根據命盤
+    var health;
+    if(g.miss.includes(5)) health='元辰宮中心位有缺，情緒能量是你健康的關鍵。心情好，身體就好；心情亂，身體最先反應。';
+    else if([7,4].includes(g.lp)) health='神經與骨骼是需要重點養護的部位，定期放鬆深層壓力，避免壓力長期積累在身體裡。';
+    else if(g.conns.includes('258')) health='你容易吸收他人的情緒能量，需要定期清理，靜心和大自然是最好的排毒方式。';
+    else health='整體健康能量尚可，維持規律的調理和作息，身體自然會給你正面的回應。';
+
+    // 元辰宮建議根據命盤
+    var yuanAdv;
+    if([9,7,6].includes(g.lp)) yuanAdv='你的元辰宮需要定期靜心和靈性滋養。冥想、接觸大自然、或系統性的靈性學習，都是讓你的宮殿能量充盈的方式。';
+    else if([1,8,4].includes(g.lp)) yuanAdv='你的元辰宮需要平衡休息與行動。定期讓自己放空，不要讓持續的推進消耗掉宮殿的基礎能量。';
+    else yuanAdv='你的元辰宮需要情感的滋養。與真正關心你的人保持深度連結，是讓宮殿能量穩定最重要的事。';
+
+    var body='<p style="font-size:.78rem;color:var(--mist);margin-bottom:14px;">※ 元辰宮為創意性命理詮釋，屬娛樂性內容，不具備客觀預測能力。</p>';
+    body+='<p style="margin-bottom:6px;">你的元辰宮場景是——</p>';
+    body+='<p style="font-family:\'Noto Serif TC\',serif;font-size:1.1rem;font-weight:700;color:var(--jade);margin-bottom:12px;">'+sc.place+'</p>';
+    body+='<div style="background:var(--gold-pale);border-radius:6px;padding:14px;margin-bottom:16px;">';
+    body+='<p style="font-size:.85rem;line-height:1.9;">氛圍：'+sc.atmo+'</p>';
+    body+='<p style="font-size:.78rem;color:var(--mist);margin-top:4px;">主色調：'+sc.color+'</p>';
+    body+='</div>';
+    body+='<p><strong>財庫：</strong>'+caiku+'</p>';
+    body+='<p style="margin-top:8px"><strong>桃花：</strong>'+taohua+'</p>';
+    body+='<p style="margin-top:8px"><strong>健康能量：</strong>'+health+'</p>';
+    body+='<p style="margin-top:8px"><strong>元辰宮建議：</strong>'+yuanAdv+'</p>';
+    html+=sec('十六','元辰宮（創意詮釋）',body);
+  }
+
+  if(id==='p17'){
+    var yr=YEAR[g.yf];
+    // 根據生命靈數給個人化建議
+    var coreAdvice={
+      1:'你最大的功課是學會放慢、等待、傾聽。當你把領導力和柔軟心結合起來，沒有人擋得住你。',
+      2:'你最大的功課是先愛自己。你給別人的那麼多，有多少留給了自己？把自己放在第一位，反而能給別人更多。',
+      3:'你最大的功課是聚焦。你的才華太多，方向太廣，找到一個主軸深耕，你的影響力會大到你自己都驚訝。',
+      4:'你最大的功課是接受彈性。不是所有事情都需要按計畫走，有時候偏離計畫反而帶你去更好的地方。',
+      5:'你最大的功課是找到內在的錨點。自由是你的天性，但心有所依，才能真正飛遠。',
+      6:'你最大的功課是接受幫助。你習慣照顧別人，但讓別人照顧你，是你這輩子需要學習的功課。',
+      7:'你最大的功課是相信直覺，然後行動。想得夠多了，是時候讓你的洞察力走出頭腦、落地成真。',
+      8:'你最大的功課是讓成功有溫度。財富和成就是手段，不是目的。找到讓你真正感到有意義的事，才是最大的成就。',
+      9:'你最大的功課是允許自己不完美。你對世界的期待很高，對自己的要求也很高，但學會接受不完美，你才能真正放鬆地發光。'
+    };
+    // 根據連線給具體事業建議
+    var careerAdvice='';
+    if(g.conns.includes('369')) careerAdvice='你的智慧線代表知識變現是你的強項，把你懂得的東西系統化、教出去，是最適合你的事業方向。';
+    else if(g.conns.includes('789')) careerAdvice='你的貴人線代表人脈是你最大的資產，越願意走出去、分享自己，貴人就越快出現。';
+    else if(g.conns.includes('168')) careerAdvice='你的財富線代表以服務換財富是你的路，把每一次服務做到讓客人感動，財富自然跟來。';
+    else if(g.conns.includes('147')) careerAdvice='你的行動力線代表你是行動派，不要等計畫完美才開始，先動起來，再邊走邊調整。';
+    else careerAdvice='你的命盤是穩健型，深耕一個領域、建立長期口碑，是最適合你的方式。不要羨慕別人的快速爆發，你的積累終將開花。';
+
+    // 根據缺數給補足建議
+    var missAdviceStr='';
+    if(g.miss.length>0){
+      var topMiss=g.miss.slice(0,2);
+      missAdviceStr='命盤中缺'+topMiss.join('與')+'的能量，這兩個面向是你需要刻意練習的地方。'+
+        topMiss.map(function(m){return NUM[m].fix;}).join('；')+'。把功課變成功力，缺的地方往往會成為你最大的突破。';
+    }
+
+    var body='';
+    body+='<div style="background:var(--gold-pale);border-radius:8px;padding:16px;margin-bottom:16px;">';
+    body+='<p style="font-family:\'Noto Serif TC\',serif;font-size:1rem;font-weight:700;color:var(--jade);margin-bottom:8px;">給'+g.name+'的話</p>';
+    body+='<p style="font-size:.88rem;line-height:1.95;">'+coreAdvice[g.lp]+'</p>';
+    body+='</div>';
+
+    body+='<div style="border-left:3px solid var(--jade);padding-left:14px;margin-bottom:16px;">';
+    body+='<p style="font-weight:700;margin-bottom:6px;">'+g.ty+'年（流年'+g.yf+'：'+yr.t+'）最重要的事</p>';
+    body+='<p style="font-size:.86rem;line-height:1.9;">'+yr.d+'</p>';
+    body+='<p style="font-size:.86rem;line-height:1.9;margin-top:8px;">'+careerAdvice+'</p>';
+    body+='</div>';
+
+    if(missAdviceStr){
+      body+='<div style="border-left:3px solid var(--rust);padding-left:14px;margin-bottom:16px;">';
+      body+='<p style="font-weight:700;color:var(--rust);margin-bottom:6px;">今年的功課</p>';
+      body+='<p style="font-size:.86rem;line-height:1.9;">'+missAdviceStr+'</p>';
+      body+='</div>';
+    }
+
+    body+='<div style="background:var(--ink);border-radius:6px;padding:16px;">';
+    body+='<p style="color:var(--gold);font-family:\'Noto Serif TC\',serif;font-weight:700;margin-bottom:10px;">接下來的三個行動</p>';
+    var actions=[
+      [1,8,4].includes(g.lp)?'在你擅長的領域，主動讓更多人看見你，不要等準備好才出發':'把現在做的事做深做透，專精比廣度更能帶來突破',
+      g.conns.length?'發揮'+CONN[g.conns[0]].name+'的優勢，找到最適合你的舞台':'找到一件你願意每天做、做十年也不厭倦的事，從那裡出發',
+      g.miss.length?'刻意練習缺'+g.miss[0]+'的能量（'+NUM[g.miss[0]].fix+'），把人生功課變成競爭優勢':'把你的完整能量整合起來，你比自己想的更有潛力'
+    ];
+    actions.forEach(function(a,i){
+      body+='<p style="color:rgba(255,255,255,.85);font-size:.85rem;line-height:1.85;margin-bottom:6px;">'+['①','②','③'][i]+' '+a+'</p>';
+    });
+    body+='</div>';
+
+    html+=sec('十七','AI 人生建議',body);
+  }
+
+  return html;
+}
+
+function item(label,val,cls){
+  return '<div class="bnum-item '+(cls||'')+'"><div class="bl">'+label+'</div><div class="bv">'+val+'</div></div>';
+}
+
+function genPalace(counts,miss){
+  // 純數字顯示，不用格子
+  var html='';
+
+  // 命盤數字一覽
+  html+='<div style="margin-bottom:20px;">';
+  html+='<div style="font-size:.8rem;color:var(--mist);margin-bottom:10px;letter-spacing:.06em;">命盤數字分布（'+g.y+'/'+g.m+'/'+g.d+'）</div>';
+  html+='<div style="display:flex;flex-wrap:wrap;gap:10px;">';
+  for(var i=1;i<=9;i++){
+    var cnt=counts[i];
+    var isMiss=(cnt===0);
+    var isMulti=(cnt>=2);
+    var bg=isMiss?'#fff0ee':isMulti?'var(--jade-lt)':'var(--gold-pale)';
+    var border=isMiss?'#f0c8c0':isMulti?'#a0ccc4':'var(--gold-lt)';
+    var col=isMiss?'var(--rust)':isMulti?'var(--jade)':'var(--gold)';
+    html+='<div style="background:'+bg+';border:1.5px solid '+border+';border-radius:6px;padding:10px 14px;text-align:center;min-width:52px;">';
+    html+='<div style="font-family:\'Noto Serif TC\',serif;font-size:1.6rem;font-weight:900;color:'+col+';line-height:1;">'+i+'</div>';
+    html+='<div style="font-size:.65rem;color:'+col+';margin-top:4px;">'+(isMiss?'缺':cnt+'次')+'</div>';
+    html+='</div>';
+  }
+  html+='</div></div>';
+
+  // 缺數
+  if(miss.length){
+    html+='<div style="margin-bottom:14px;">';
+    html+='<div style="font-size:.82rem;font-weight:700;color:var(--rust);margin-bottom:8px;">缺數（人生功課）：</div>';
+    html+='<div class="chip-row">';
+    miss.forEach(function(n){html+='<span class="chip r">缺 '+n+'</span>';});
+    html+='</div></div>';
+  } else {
+    html+='<p style="color:var(--jade);font-size:.85rem;margin-bottom:14px;">✦ 1～9 全數具備，能量完整圓滿</p>';
+  }
+
+  // 強化數
+  var multi=Object.keys(counts).filter(function(k){return counts[k]>=2;});
+  if(multi.length){
+    html+='<div>';
+    html+='<div style="font-size:.82rem;font-weight:700;color:var(--jade);margin-bottom:8px;">強化數（天生優勢）：</div>';
+    html+='<div class="chip-row">';
+    multi.forEach(function(k){html+='<span class="chip j">'+k+' 出現 '+counts[k]+' 次</span>';});
+    html+='</div></div>';
+  }
+
+  return html;
+}
+
+// ══════════════════════════════════════════════════════
+// COPY
+// ══════════════════════════════════════════════════════
+function buildCopy(){
+  var g=G;
+  var t='靈數命盤完整報告\n';
+  t+='姓名：'+g.name+'　生日：'+g.y+'/'+g.m+'/'+g.d+'　'+g.status+'\n';
+  t+='生命靈數：'+g.lp+'（'+NUM[g.lp].label+'）　流年'+g.ty+'：'+g.yf+'（'+YEAR[g.yf].t+'）\n';
+  t+='缺數：'+(g.miss.length?g.miss.join('、'):'無')+'　連線：'+(g.conns.length?g.conns.join('、'):'無')+'\n\n';
+  t+='◆ 性格\n'+NUM[g.lp].good+'\n\n';
+  t+='◆ 財運\n靠'+NUM[g.lp].job.split('、')[0]+'方向發展，流年'+g.yf+'（'+YEAR[g.yf].t+'）：'+YEAR[g.yf].d+'\n\n';
+  t+='◆ '+g.ty+'流月\n';
+  for(var mo=1;mo<=12;mo++){
+    var mf=monthFlow(g.yf,mo);
+    t+=mo+'月 流月'+mf+'（'+NUM[mf].label+'）：'+MONTH_TIPS[mo-1]+'\n';
+  }
+  t+='\n◆ 建議\n'+YEAR[g.yf].d;
+  document.getElementById('copy-buf').textContent=t;
+}
+
+// 複製文字通用函式（支援舊版瀏覽器）
+function copyText(text, label){
+  if(!text||!text.trim()){alert('請先解析命盤');return;}
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){
+      alert('✅ '+label+'已複製！可直接貼給客人。');
+    }).catch(function(){
+      fallbackCopy(text, label);
+    });
+  } else {
+    fallbackCopy(text, label);
+  }
+}
+function fallbackCopy(text, label){
+  var ta=document.createElement('textarea');
+  ta.value=text;
+  ta.style.position='fixed';
+  ta.style.opacity='0';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try{
+    document.execCommand('copy');
+    alert('✅ '+label+'已複製！');
+  }catch(e){
+    alert('請長按文字手動複製');
+  }
+  document.body.removeChild(ta);
+}
+
+// 複製當前頁面內容
+function copyCurrentPage(){
+  if(!G||!G.name){alert('請先解析命盤');return;}
+  // 找到目前顯示的頁面
+  var activePage=document.querySelector('.page.on');
+  if(!activePage){alert('請先選擇要複製的頁面');return;}
+  // 取得頁面標題
+  var heading=activePage.querySelector('.sec-head');
+  var title=heading?heading.textContent.trim():'';
+  // 取得純文字內容
+  var secBody=activePage.querySelector('.sec-body');
+  var bodyText=secBody?secBody.innerText||secBody.textContent:'';
+  // 組合輸出
+  var output='【'+G.name+' ｜ '+G.y+'/'+G.m+'/'+G.d+' 靈數命盤】\n';
+  output+='——'+title+'——\n\n';
+  output+=bodyText.trim();
+  output+='\n\n（本報告由靈數命盤系統生成）';
+  copyText(output, title);
+}
+
+function copyReport(){
+  var t=document.getElementById('copy-buf').textContent;
+  copyText(t, '完整報告');
+}
+
+// ══════════════════════════════════════════════════════
+// CRM
+// ══════════════════════════════════════════════════════
+var clients=JSON.parse(localStorage.getItem('mp_clients')||'[]');
+var editIdx=-1;
+
+function renderClients(){
+  var el=document.getElementById('client-list');
+  if(!clients.length){
+    el.innerHTML='<div style="text-align:center;padding:40px;color:var(--mist);font-size:.88rem;">尚未新增任何客戶</div>';
+    return;
+  }
+  el.innerHTML='';
+  clients.forEach(function(c,i){
+    var lp='';
+    if(c.year&&c.month&&c.day) lp='靈數'+lifePath(+c.year,+c.month,+c.day);
+    var div=document.createElement('div');
+    div.className='client-card';
+    div.innerHTML='<div class="cc-info"><h3>'+c.name+'</h3><p>'+c.phone+(lp?' ｜ '+lp:'')+(c.note?' ｜ '+c.note:'')+'</p></div>'+
+      '<div class="cc-btns">'+
+      '<button class="cc-btn primary" onclick="loadClient('+i+')">解析</button>'+
+      '<button class="cc-btn" onclick="editClient('+i+')">編輯</button>'+
+      '<button class="cc-btn" onclick="delClient('+i+')">刪除</button>'+
+      '</div>';
+    el.appendChild(div);
+  });
+}
+
+function openAddClient(){
+  editIdx=-1;
+  document.getElementById('modal-title').textContent='新增客戶';
+  ['c-name','c-phone','c-year','c-month','c-day','c-note'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('client-modal').classList.add('on');
+}
+function editClient(i){
+  editIdx=i;
+  var c=clients[i];
+  document.getElementById('modal-title').textContent='編輯客戶';
+  document.getElementById('c-name').value=c.name||'';
+  document.getElementById('c-phone').value=c.phone||'';
+  document.getElementById('c-year').value=c.year||'';
+  document.getElementById('c-month').value=c.month||'';
+  document.getElementById('c-day').value=c.day||'';
+  document.getElementById('c-note').value=c.note||'';
+  document.getElementById('client-modal').classList.add('on');
+}
+function closeModal(){ document.getElementById('client-modal').classList.remove('on'); }
+function saveClient(){
+  var c={
+    name:document.getElementById('c-name').value.trim(),
+    phone:document.getElementById('c-phone').value.trim(),
+    year:document.getElementById('c-year').value.trim(),
+    month:document.getElementById('c-month').value.trim(),
+    day:document.getElementById('c-day').value.trim(),
+    note:document.getElementById('c-note').value.trim()
+  };
+  if(!c.name){alert('請輸入姓名');return;}
+  if(editIdx>=0) clients[editIdx]=c;
+  else clients.push(c);
+  localStorage.setItem('mp_clients',JSON.stringify(clients));
+  closeModal();
+  renderClients();
+}
+function delClient(i){
+  if(!confirm('確定刪除\u300c'+clients[i].name+'\u300d？')) return;
+  clients.splice(i,1);
+  localStorage.setItem('mp_clients',JSON.stringify(clients));
+  renderClients();
+}
+function loadClient(i){
+  var c=clients[i];
+  document.getElementById('f-name').value=c.name||'';
+  if(c.year) document.getElementById('f-year').value=c.year;
+  if(c.month) document.getElementById('f-month').value=c.month;
+  if(c.day) document.getElementById('f-day').value=c.day;
+  goNav('analyze',document.querySelector('.nav a'));
+  document.querySelector('.nav a').classList.add('on');
+  document.querySelectorAll('.nav a')[1].classList.remove('on');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
